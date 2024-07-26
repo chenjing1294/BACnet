@@ -12,9 +12,11 @@ public enum BacnetConfirmedServices : byte
     SERVICE_CONFIRMED_SUBSCRIBE_COV = 5,
     SERVICE_CONFIRMED_SUBSCRIBE_COV_PROPERTY = 28,
     SERVICE_CONFIRMED_LIFE_SAFETY_OPERATION = 27,
+
     /* File Access Services */
     SERVICE_CONFIRMED_ATOMIC_READ_FILE = 6,
     SERVICE_CONFIRMED_ATOMIC_WRITE_FILE = 7,
+
     /* Object Access Services */
     SERVICE_CONFIRMED_ADD_LIST_ELEMENT = 8,
     SERVICE_CONFIRMED_REMOVE_LIST_ELEMENT = 9,
@@ -26,18 +28,22 @@ public enum BacnetConfirmedServices : byte
     SERVICE_CONFIRMED_READ_RANGE = 26,
     SERVICE_CONFIRMED_WRITE_PROPERTY = 15,
     SERVICE_CONFIRMED_WRITE_PROP_MULTIPLE = 16,
+
     /* Remote Device Management Services */
     SERVICE_CONFIRMED_DEVICE_COMMUNICATION_CONTROL = 17,
     SERVICE_CONFIRMED_PRIVATE_TRANSFER = 18,
     SERVICE_CONFIRMED_TEXT_MESSAGE = 19,
     SERVICE_CONFIRMED_REINITIALIZE_DEVICE = 20,
+
     /* Virtual Terminal Services */
     SERVICE_CONFIRMED_VT_OPEN = 21,
     SERVICE_CONFIRMED_VT_CLOSE = 22,
     SERVICE_CONFIRMED_VT_DATA = 23,
+
     /* Security Services */
     SERVICE_CONFIRMED_AUTHENTICATE = 24,
     SERVICE_CONFIRMED_REQUEST_KEY = 25,
+
     /* Services added after 1995 */
     /* readRange (26) see Object Access Services */
     /* lifeSafetyOperation (27) see Alarm and Event Services */

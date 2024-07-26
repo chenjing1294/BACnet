@@ -15,12 +15,13 @@ public struct BacnetBitString
         {
             ret += ((value[i / 8] & (1 << (i % 8))) > 0 ? "1" : "0");
         }
+
         return ret;
     }
 
     public void SetBit(byte bitNumber, bool v)
     {
-        var byteNumber = (byte)(bitNumber / 8);
+        var byteNumber = (byte) (bitNumber / 8);
         byte bitMask = 1;
 
         if (value == null)
@@ -30,18 +31,18 @@ public struct BacnetBitString
         {
             /* set max bits used */
             if (bits_used < bitNumber + 1)
-                bits_used = (byte)(bitNumber + 1);
-            bitMask = (byte)(bitMask << (bitNumber - byteNumber * 8));
+                bits_used = (byte) (bitNumber + 1);
+            bitMask = (byte) (bitMask << (bitNumber - byteNumber * 8));
             if (v)
                 value[byteNumber] |= bitMask;
             else
-                value[byteNumber] &= (byte)~bitMask;
+                value[byteNumber] &= (byte) ~bitMask;
         }
     }
 
     public bool GetBit(byte bitNumber)
     {
-        var byteNumber = (byte)(bitNumber / 8);
+        var byteNumber = (byte) (bitNumber / 8);
 
         if (byteNumber >= ASN1.MAX_BITSTRING_BYTES || bitNumber >= bits_used)
             throw new ArgumentOutOfRangeException(nameof(bitNumber));
@@ -49,7 +50,7 @@ public struct BacnetBitString
         if (value == null)
             return false;
 
-        var bitMask = (byte)(1 << (bitNumber - byteNumber * 8));
+        var bitMask = (byte) (1 << (bitNumber - byteNumber * 8));
         return (value[byteNumber] & bitMask) > 0;
     }
 
@@ -63,11 +64,11 @@ public struct BacnetBitString
         if (string.IsNullOrEmpty(str))
             return ret;
 
-        ret.bits_used = (byte)str.Length;
+        ret.bits_used = (byte) str.Length;
         for (var i = 0; i < ret.bits_used; i++)
         {
             var isSet = str[i] == '1';
-            if (isSet) ret.value[i / 8] |= (byte)(1 << (i % 8));
+            if (isSet) ret.value[i / 8] |= (byte) (1 << (i % 8));
         }
 
         return ret;
@@ -85,7 +86,7 @@ public struct BacnetBitString
         return new BacnetBitString
         {
             value = BitConverter.GetBytes(value),
-            bits_used = (byte)Math.Ceiling(Math.Log(value, 2))
+            bits_used = (byte) Math.Ceiling(Math.Log(value, 2))
         };
     }
 };

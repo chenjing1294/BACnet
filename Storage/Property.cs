@@ -9,14 +9,8 @@ public class Property
     [XmlAttribute("Id")]
     public string IdText
     {
-        get
-        {
-            return Id.ToString();
-        }
-        set
-        {
-            Id = (BacnetPropertyIds)Enum.Parse(typeof(BacnetPropertyIds), value);
-        }
+        get { return Id.ToString(); }
+        set { Id = (BacnetPropertyIds) Enum.Parse(typeof(BacnetPropertyIds), value); }
     }
 
     [XmlAttribute]
@@ -89,17 +83,19 @@ public class Property
             case BacnetApplicationTags.BACNET_APPLICATION_TAG_NULL:
                 return value.ToString(); // Modif FC
             case BacnetApplicationTags.BACNET_APPLICATION_TAG_REAL:
-                return ((float)value.Value).ToString(CultureInfo.InvariantCulture);
+                return ((float) value.Value).ToString(CultureInfo.InvariantCulture);
             case BacnetApplicationTags.BACNET_APPLICATION_TAG_DOUBLE:
-                return ((double)value.Value).ToString(CultureInfo.InvariantCulture);
+                return ((double) value.Value).ToString(CultureInfo.InvariantCulture);
             case BacnetApplicationTags.BACNET_APPLICATION_TAG_OCTET_STRING:
-                return Convert.ToBase64String((byte[])value.Value);
+                return Convert.ToBase64String((byte[]) value.Value);
             case BacnetApplicationTags.BACNET_APPLICATION_TAG_CONTEXT_SPECIFIC_DECODED:
-                {
-                    return value.Value is byte[]? Convert.ToBase64String((byte[])value.Value)
-                        : string.Join(";", ((BacnetValue[])value.Value)
-                            .Select(v => SerializeValue(v, v.Tag)));
-                }
+            {
+                return value.Value is byte[]
+                    ? Convert.ToBase64String((byte[]) value.Value)
+                    : string.Join(
+                        ";", ((BacnetValue[]) value.Value)
+                        .Select(v => SerializeValue(v, v.Tag)));
+            }
             default:
                 return value.Value.ToString();
         }
@@ -119,9 +115,6 @@ public class Property
 
             return ret;
         }
-        set
-        {
-            Value = value.Select(v => SerializeValue(v, Tag)).ToArray();
-        }
+        set { Value = value.Select(v => SerializeValue(v, Tag)).ToArray(); }
     }
 }

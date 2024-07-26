@@ -16,6 +16,7 @@ public enum BacnetReliability : uint
     RELIABILITY_MEMBER_FAULT = 11,
     RELIABILITY_COMMUNICATION_FAILURE = 12,
     RELIABILITY_TRIPPED = 13,
+
     /* Enumerated values 0-63 are reserved for definition by ASHRAE.  */
     /* Enumerated values 64-65535 may be used by others subject to  */
     /* the procedures and constraints described in Clause 23. */

@@ -9,7 +9,7 @@ public struct BacnetEventNotificationData
     public uint notificationClass;
     public byte priority;
     public BacnetEventTypes eventType;
-    public string messageText;       /* OPTIONAL - Set to NULL if not being used */
+    public string messageText; /* OPTIONAL - Set to NULL if not being used */
     public BacnetNotifyTypes notifyType;
     public bool ackRequired;
     public BacnetEventStates fromState;
@@ -24,46 +24,60 @@ public struct BacnetEventNotificationData
      ** EVENT_CHANGE_OF_BITSTRING
      */
     public BacnetBitString changeOfBitstring_referencedBitString;
+
     public BacnetBitString changeOfBitstring_statusFlags;
+
     /*
      ** EVENT_CHANGE_OF_STATE
      */
     public BacnetPropertyState changeOfState_newState;
+
     public BacnetBitString changeOfState_statusFlags;
+
     /*
      ** EVENT_CHANGE_OF_VALUE
      */
     public BacnetBitString changeOfValue_changedBits;
     public float changeOfValue_changeValue;
     public BacnetCOVTypes? changeOfValue_tag;
+
     public BacnetBitString changeOfValue_statusFlags;
+
     /*
      ** EVENT_COMMAND_FAILURE
      */
     public uint commandFailure_commandValue;
     public BacnetBitString commandFailure_statusFlags;
+
     public uint commandFailure_feedbackValue;
+
     /*
      ** EVENT_FLOATING_LIMIT
      */
     public float floatingLimit_referenceValue;
     public BacnetBitString floatingLimit_statusFlags;
     public float floatingLimit_setPointValue;
+
     public float floatingLimit_errorLimit;
+
     /*
      ** EVENT_OUT_OF_RANGE
      */
     public float outOfRange_exceedingValue;
     public BacnetBitString outOfRange_statusFlags;
     public float outOfRange_deadband;
+
     public float outOfRange_exceededLimit;
+
     /*
      ** EVENT_CHANGE_OF_LIFE_SAFETY
      */
     public BacnetLifeSafetyStates? changeOfLifeSafety_newState;
     public BacnetLifeSafetyModes? changeOfLifeSafety_newMode;
     public BacnetBitString changeOfLifeSafety_statusFlags;
+
     public BacnetLifeSafetyOperations? changeOfLifeSafety_operationExpected;
+
     /*
      ** EVENT_EXTENDED
      **
@@ -74,19 +88,25 @@ public struct BacnetEventNotificationData
      */
     public BacnetDeviceObjectPropertyReference bufferReady_bufferProperty;
     public uint bufferReady_previousNotification;
+
     public uint bufferReady_currentNotification;
+
     /*
      ** EVENT_UNSIGNED_RANGE
      */
     public uint unsignedRange_exceedingValue;
     public BacnetBitString unsignedRange_statusFlags;
+
     public uint unsignedRange_exceededLimit;
+
     /*
      ** EVENT_EXTENDED
      */
     public uint extended_vendorId;
     public uint extended_eventType;
+
     public object[] extended_parameters;
+
     /*
      ** EVENT_CHANGE_OF_RELIABILITY
      */
@@ -97,9 +117,9 @@ public struct BacnetEventNotificationData
     public override string ToString()
     {
         return $"initiatingObject: {initiatingObjectIdentifier}, eventObject: {eventObjectIdentifier}, "
-             + $"eventType: {eventType}, notifyType: {notifyType}, timeStamp: {timeStamp}, "
-             + $"fromState: {fromState}, toState: {toState}"
-             + (notifyType != BacnetNotifyTypes.NOTIFY_ACK_NOTIFICATION ? $", {GetEventDetails()}" : "");
+               + $"eventType: {eventType}, notifyType: {notifyType}, timeStamp: {timeStamp}, "
+               + $"fromState: {fromState}, toState: {toState}"
+               + (notifyType != BacnetNotifyTypes.NOTIFY_ACK_NOTIFICATION ? $", {GetEventDetails()}" : "");
     }
 
     private string GetEventDetails()

@@ -14,9 +14,11 @@ public enum BacnetServicesSupported
     SERVICE_SUPPORTED_LIFE_SAFETY_OPERATION = 37,
     SERVICE_SUPPORTED_CONFIRMED_AUDIT_NOTIFICATION = 44,
     SERVICE_SUPPORTED_AUDIT_LOG_QUERY = 45,
+
     /* File Access Services */
     SERVICE_SUPPORTED_ATOMIC_READ_FILE = 6,
     SERVICE_SUPPORTED_ATOMIC_WRITE_FILE = 7,
+
     /* Object Access Services */
     SERVICE_SUPPORTED_ADD_LIST_ELEMENT = 8,
     SERVICE_SUPPORTED_REMOVE_LIST_ELEMENT = 9,
@@ -29,6 +31,7 @@ public enum BacnetServicesSupported
     SERVICE_SUPPORTED_WRITE_PROPERTY = 15,
     SERVICE_SUPPORTED_WRITE_PROP_MULTIPLE = 16,
     SERVICE_SUPPORTED_WRITE_GROUP = 40,
+
     /* Remote Device Management Services */
     SERVICE_SUPPORTED_DEVICE_COMMUNICATION_CONTROL = 17,
     SERVICE_SUPPORTED_PRIVATE_TRANSFER = 18,
@@ -36,13 +39,16 @@ public enum BacnetServicesSupported
     SERVICE_SUPPORTED_REINITIALIZE_DEVICE = 20,
     SERVICE_SUPPORTED_WHO_AM_I = 47,
     SERVICE_SUPPORTED_YOU_ARE = 48,
+
     /* Virtual Terminal Services */
     SERVICE_SUPPORTED_VT_OPEN = 21,
     SERVICE_SUPPORTED_VT_CLOSE = 22,
     SERVICE_SUPPORTED_VT_DATA = 23,
+
     /* Security Services */
     SERVICE_SUPPORTED_AUTHENTICATE = 24,
     SERVICE_SUPPORTED_REQUEST_KEY = 25,
+
     /* Unconfirmed Services */
     SERVICE_SUPPORTED_I_AM = 26,
     SERVICE_SUPPORTED_I_HAVE = 27,
@@ -55,6 +61,7 @@ public enum BacnetServicesSupported
     SERVICE_SUPPORTED_WHO_HAS = 33,
     SERVICE_SUPPORTED_WHO_IS = 34,
     SERVICE_SUPPORTED_UNCONFIRMED_AUDIT_NOTIFICATION = 46,
+
     /* Other services to be added as they are defined. */
     /* All values in this production are reserved */
     /* for definition by ASHRAE. */

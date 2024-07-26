@@ -51,7 +51,7 @@ public struct BacnetObjectId : IComparable<BacnetObjectId>
             return 1;
 
         // cast to int for comparison otherwise unpredictable behaviour with outbound enum (proprietary type)
-        return ((int)Type).CompareTo((int)other.Type);
+        return ((int) Type).CompareTo((int) other.Type);
     }
 
     public static bool operator ==(BacnetObjectId a, BacnetObjectId b)
@@ -71,12 +71,12 @@ public struct BacnetObjectId : IComparable<BacnetObjectId>
         if (string.IsNullOrEmpty(value) || !pattern.IsMatch(value))
             return new BacnetObjectId();
 
-        var objectType = (BacnetObjectTypes)Enum.Parse(typeof(BacnetObjectTypes),
+        var objectType = (BacnetObjectTypes) Enum.Parse(
+            typeof(BacnetObjectTypes),
             pattern.Match(value).Groups[nameof(Type)].Value);
 
         var objectInstance = uint.Parse(pattern.Match(value).Groups[nameof(Instance)].Value);
 
         return new BacnetObjectId(objectType, objectInstance);
     }
-
 };

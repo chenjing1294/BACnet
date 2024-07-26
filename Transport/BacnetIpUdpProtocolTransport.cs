@@ -1,28 +1,28 @@
 ﻿/**************************************************************************
-*                           MIT License
-* 
-* Copyright (C) 2014 Morten Kvistgaard <mk@pch-engineering.dk>
-*
-* Permission is hereby granted, free of charge, to any person obtaining
-* a copy of this software and associated documentation files (the
-* "Software"), to deal in the Software without restriction, including
-* without limitation the rights to use, copy, modify, merge, publish,
-* distribute, sublicense, and/or sell copies of the Software, and to
-* permit persons to whom the Software is furnished to do so, subject to
-* the following conditions:
-*
-* The above copyright notice and this permission notice shall be included
-* in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*
-*********************************************************************/
+ *                           MIT License
+ *
+ * Copyright (C) 2014 Morten Kvistgaard <mk@pch-engineering.dk>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *********************************************************************/
 
 namespace System.IO.BACnet;
 
@@ -46,7 +46,7 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
     // Give 0.0.0.0:xxxx if the socket is open with System.Net.IPAddress.Any
     // Today only used by _GetBroadcastAddress method & the bvlc layer class in BBMD mode
     // Some more complex solutions could avoid this, that's why this property is virtual
-    public virtual IPEndPoint LocalEndPoint => (IPEndPoint)_exclusiveConn.Client.LocalEndPoint;
+    public virtual IPEndPoint LocalEndPoint => (IPEndPoint) _exclusiveConn.Client.LocalEndPoint;
 
     public BacnetIpUdpProtocolTransport(int port, bool useExclusivePort = false, bool dontFragment = false,
         int maxPayload = 1472, string localEndpointIp = "")
@@ -94,7 +94,7 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
             /* We (might) only recieve the broadcasts on this. Any unicasts to this might be eaten by another local client */
             if (_sharedConn == null)
             {
-                _sharedConn = new UdpClient { ExclusiveAddressUse = false };
+                _sharedConn = new UdpClient {ExclusiveAddressUse = false};
                 _sharedConn.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 var ep = new IPEndPoint(IPAddress.Any, SharedPort);
                 if (!string.IsNullOrEmpty(_localEndpoint)) ep = new IPEndPoint(IPAddress.Parse(_localEndpoint), SharedPort);
@@ -103,6 +103,7 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
                 SetDontFragment(_sharedConn, _dontFragment);
                 Log.Info($"Binded shared {ep} using UDP");
             }
+
             /* This is our own exclusive port. We'll recieve everything sent to this. */
             /* So this is how we'll present our selves to the world */
             if (_exclusiveConn == null)
@@ -112,7 +113,7 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
                 _exclusiveConn = new UdpClient(ep);
 
                 // Gets the Endpoint : the assigned Udp port number in fact
-                ep = (IPEndPoint)_exclusiveConn.Client.LocalEndPoint;
+                ep = (IPEndPoint) _exclusiveConn.Client.LocalEndPoint;
                 // closes the socket
                 _exclusiveConn.Close();
                 // Re-opens it with the freeed port number, to be sure it's a real active/server socket
@@ -130,7 +131,7 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
         {
             var ep = new IPEndPoint(IPAddress.Any, SharedPort);
             if (!string.IsNullOrEmpty(_localEndpoint)) ep = new IPEndPoint(IPAddress.Parse(_localEndpoint), SharedPort);
-            _exclusiveConn = new UdpClient { ExclusiveAddressUse = true };
+            _exclusiveConn = new UdpClient {ExclusiveAddressUse = true};
             DisableConnReset(_exclusiveConn);
             _exclusiveConn.Client.Bind(ep);
             SetDontFragment(_exclusiveConn, _dontFragment);
@@ -178,8 +179,9 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
             const uint IOC_VENDOR = 0x18000000;
             const uint SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12;
 
-            client?.Client.IOControl(unchecked((int)SIO_UDP_CONNRESET),
-                new[] { System.Convert.ToByte(false) }, null);
+            client?.Client.IOControl(
+                unchecked((int) SIO_UDP_CONNRESET),
+                new[] {System.Convert.ToByte(false)}, null);
         }
     }
 
@@ -200,7 +202,7 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
 
     private void OnReceiveData(IAsyncResult asyncResult)
     {
-        var connection = (UdpClient)asyncResult.AsyncState;
+        var connection = (UdpClient) asyncResult.AsyncState;
 
         try
         {
@@ -262,8 +264,8 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
                 case BacnetBvlcFunctions.BVLC_FORWARDED_NPDU:
                     // BVLC_FORWARDED_NPDU frame by a BBMD, change the remote_address to the original one
                     // stored in the BVLC header, we don't care about the BBMD address
-                    var ip = ((long)receiveBuffer[7] << 24) + ((long)receiveBuffer[6] << 16) +
-                             ((long)receiveBuffer[5] << 8) + receiveBuffer[4];
+                    var ip = ((long) receiveBuffer[7] << 24) + ((long) receiveBuffer[6] << 16) +
+                             ((long) receiveBuffer[5] << 8) + receiveBuffer[4];
 
                     var port = (receiveBuffer[8] << 8) + receiveBuffer[9]; // 0xbac0 maybe
                     Convert(new IPEndPoint(ip, port), out remoteAddress);
@@ -307,6 +309,7 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
         Bvlc.SendRegisterAsForeignDevice(bbmd, ttl);
         return true;
     }
+
     public bool SendRemoteWhois(byte[] buffer, IPEndPoint bbmd, int msgLength)
     {
         if (bbmd.AddressFamily != AddressFamily.InterNetwork)
@@ -324,17 +327,18 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
     public int Send(byte[] buffer, int dataLength, IPEndPoint ep)
     {
         // return _exclusiveConn.Send(buffer, data_length, ep);
-        ThreadPool.QueueUserWorkItem(o =>
-        {
-            try
+        ThreadPool.QueueUserWorkItem(
+            o =>
             {
-                _exclusiveConn.Send(buffer, dataLength, ep);
-            }
-            catch
-            {
+                try
+                {
+                    _exclusiveConn.Send(buffer, dataLength, ep);
+                }
+                catch
+                {
                     // not much you can do about at this point
                 }
-        }, null);
+            }, null);
 
         return dataLength;
     }
@@ -345,9 +349,10 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
 
         //add header
         var fullLength = dataLength + HeaderLength;
-        Bvlc.Encode(buffer, offset - BVLC.BVLC_HEADER_LENGTH, address.net == 0xFFFF
-            ? BacnetBvlcFunctions.BVLC_ORIGINAL_BROADCAST_NPDU
-            : BacnetBvlcFunctions.BVLC_ORIGINAL_UNICAST_NPDU, fullLength);
+        Bvlc.Encode(
+            buffer, offset - BVLC.BVLC_HEADER_LENGTH, address.net == 0xFFFF
+                ? BacnetBvlcFunctions.BVLC_ORIGINAL_BROADCAST_NPDU
+                : BacnetBvlcFunctions.BVLC_ORIGINAL_UNICAST_NPDU, fullLength);
 
         //create end point
         Convert(address, out var ep);
@@ -366,7 +371,7 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
     public static void Convert(IPEndPoint ep, out BacnetAddress address)
     {
         var tmp1 = ep.Address.GetAddressBytes();
-        var tmp2 = BitConverter.GetBytes((ushort)ep.Port);
+        var tmp2 = BitConverter.GetBytes((ushort) ep.Port);
         Array.Reverse(tmp2);
         Array.Resize(ref tmp1, tmp1.Length + tmp2.Length);
         Array.Copy(tmp2, 0, tmp1, tmp1.Length - tmp2.Length, tmp2.Length);
@@ -376,7 +381,7 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
     public static void Convert(BacnetAddress address, out IPEndPoint ep)
     {
         long ipAddress = BitConverter.ToUInt32(address.adr, 0);
-        var port = (ushort)((address.adr[4] << 8) | (address.adr[5] << 0));
+        var port = (ushort) ((address.adr[4] << 8) | (address.adr[5] << 0));
         ep = new IPEndPoint(ipAddress, port);
     }
 
@@ -416,12 +421,12 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
         {
             // restricted local broadcast (directed ... routable)
             foreach (var adapter in NetworkInterface.GetAllNetworkInterfaces())
-                foreach (var ip in adapter.GetIPProperties().UnicastAddresses)
-                    if (LocalEndPoint.Address.Equals(ip.Address))
-                    {
-                        ipAddr = ip;
-                        break;
-                    }
+            foreach (var ip in adapter.GetIPProperties().UnicastAddresses)
+                if (LocalEndPoint.Address.Equals(ip.Address))
+                {
+                    ipAddr = ip;
+                    break;
+                }
         }
 
         if (ipAddr != null)
@@ -433,9 +438,10 @@ public class BacnetIpUdpProtocolTransport : BacnetTransportBase
                 var broadcastStr = new StringBuilder();
                 for (var i = 0; i < 4; i++)
                 {
-                    broadcastStr.Append(((byte)(int.Parse(strCurrentIP[i]) | ~int.Parse(strIPNetMask[i]))).ToString());
+                    broadcastStr.Append(((byte) (int.Parse(strCurrentIP[i]) | ~int.Parse(strIPNetMask[i]))).ToString());
                     if (i != 3) broadcastStr.Append('.');
                 }
+
                 ep = new IPEndPoint(IPAddress.Parse(broadcastStr.ToString()), SharedPort);
             }
             catch

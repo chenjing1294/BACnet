@@ -78,7 +78,7 @@ public class BacnetPtpProtocolTransport : BacnetTransportBase
     public override bool Equals(object obj)
     {
         if (obj is not BacnetPtpProtocolTransport) return false;
-        var a = (BacnetPtpProtocolTransport)obj;
+        var a = (BacnetPtpProtocolTransport) obj;
         return _port.Equals(a._port);
     }
 
@@ -95,13 +95,13 @@ public class BacnetPtpProtocolTransport : BacnetTransportBase
     private void SendGreeting()
     {
         Log.Debug("Sending Greeting");
-        byte[] greeting = { PTP.PTP_GREETING_PREAMBLE1, PTP.PTP_GREETING_PREAMBLE2, 0x43, 0x6E, 0x65, 0x74, 0x0D }; // BACnet\n
+        byte[] greeting = {PTP.PTP_GREETING_PREAMBLE1, PTP.PTP_GREETING_PREAMBLE2, 0x43, 0x6E, 0x65, 0x74, 0x0D}; // BACnet\n
         _port.Write(greeting, 0, greeting.Length);
     }
 
     private static bool IsGreeting(IList<byte> buffer, int offset, int maxOffset)
     {
-        byte[] greeting = { PTP.PTP_GREETING_PREAMBLE1, PTP.PTP_GREETING_PREAMBLE2, 0x43, 0x6E, 0x65, 0x74, 0x0D }; // BACnet\n
+        byte[] greeting = {PTP.PTP_GREETING_PREAMBLE1, PTP.PTP_GREETING_PREAMBLE2, 0x43, 0x6E, 0x65, 0x74, 0x0D}; // BACnet\n
         maxOffset = Math.Min(offset + greeting.Length, maxOffset);
         for (var i = offset; i < maxOffset; i++)
             if (buffer[i] != greeting[i - offset])
@@ -119,6 +119,7 @@ public class BacnetPtpProtocolTransport : BacnetTransportBase
                     Array.Copy(buffer, 1, buffer, 0, maxOffset - 1);
                 maxOffset--;
             }
+
             if (maxOffset > 1 && buffer[1] != 0x41)
                 buffer[0] = 0xFF;
             else if (maxOffset > 2 && buffer[2] != 0x43)
@@ -151,6 +152,7 @@ public class BacnetPtpProtocolTransport : BacnetTransportBase
             //remove garbage
             RemoveGreetingGarbage(buffer, ref offset);
         }
+
         return true;
     }
 
@@ -266,7 +268,7 @@ public class BacnetPtpProtocolTransport : BacnetTransportBase
 
     private void SendWithXonXoff(byte[] buffer, int offset, int length)
     {
-        var escape = new byte[1] { 0x10 };
+        var escape = new byte[1] {0x10};
         var maxOffset = length + offset;
 
         //scan
@@ -303,7 +305,7 @@ public class BacnetPtpProtocolTransport : BacnetTransportBase
     private void SendDisconnect(BacnetPtpDisconnectReasons bacnetPtpDisconnectReasons)
     {
         var buffer = new byte[PTP.PTP_HEADER_LENGTH + 1 + 2];
-        buffer[PTP.PTP_HEADER_LENGTH] = (byte)bacnetPtpDisconnectReasons;
+        buffer[PTP.PTP_HEADER_LENGTH] = (byte) bacnetPtpDisconnectReasons;
         SendFrame(BacnetPtpFrameTypes.FRAME_TYPE_DISCONNECT_REQUEST, buffer, 1);
     }
 
@@ -319,6 +321,7 @@ public class BacnetPtpProtocolTransport : BacnetTransportBase
             RemoveGarbage(buffer, ref offset);
             return status;
         }
+
         if (rx < 0)
         {
             //drop message
@@ -381,6 +384,7 @@ public class BacnetPtpProtocolTransport : BacnetTransportBase
                 Log.Debug(frameType);
                 return BacnetMstpProtocolTransport.GetMessageStatus.Good;
             }
+
             //drop message
             buffer[0] = 0xFF;
             RemoveGarbage(buffer, ref offset);
@@ -546,11 +550,13 @@ public class BacnetPtpProtocolTransport : BacnetTransportBase
                                     var pass = Encoding.ASCII.GetBytes(Password);
                                     var tmpBuffer = new byte[PTP.PTP_HEADER_LENGTH + pass.Length + 2];
                                     Array.Copy(pass, 0, tmpBuffer, PTP.PTP_HEADER_LENGTH, pass.Length);
-                                    SendFrame(BacnetPtpFrameTypes.FRAME_TYPE_CONNECT_RESPONSE, tmpBuffer,
+                                    SendFrame(
+                                        BacnetPtpFrameTypes.FRAME_TYPE_CONNECT_RESPONSE, tmpBuffer,
                                         pass.Length);
                                 }
                                 else
                                     SendFrame(BacnetPtpFrameTypes.FRAME_TYPE_CONNECT_RESPONSE);
+
                                 //we're ready
                                 SendFrame(BacnetPtpFrameTypes.FRAME_TYPE_HEARTBEAT_XON);
                                 break;
@@ -558,7 +564,8 @@ public class BacnetPtpProtocolTransport : BacnetTransportBase
                             case BacnetPtpFrameTypes.FRAME_TYPE_CONNECT_RESPONSE:
                                 if (msgLength > 0 && !string.IsNullOrEmpty(Password))
                                 {
-                                    var password = Encoding.ASCII.GetString(buffer, PTP.PTP_HEADER_LENGTH,
+                                    var password = Encoding.ASCII.GetString(
+                                        buffer, PTP.PTP_HEADER_LENGTH,
                                         msgLength);
                                     if (password != Password)
                                         SendDisconnect(BacnetPtpDisconnectReasons.PTP_DISCONNECT_INVALID_PASSWORD);
@@ -570,12 +577,13 @@ public class BacnetPtpProtocolTransport : BacnetTransportBase
                                     //we're ready
                                     SendFrame(BacnetPtpFrameTypes.FRAME_TYPE_HEARTBEAT_XON);
                                 }
+
                                 break;
 
                             case BacnetPtpFrameTypes.FRAME_TYPE_DISCONNECT_REQUEST:
                                 var reason = BacnetPtpDisconnectReasons.PTP_DISCONNECT_OTHER;
                                 if (msgLength > 0)
-                                    reason = (BacnetPtpDisconnectReasons)buffer[PTP.PTP_HEADER_LENGTH];
+                                    reason = (BacnetPtpDisconnectReasons) buffer[PTP.PTP_HEADER_LENGTH];
                                 SendFrame(BacnetPtpFrameTypes.FRAME_TYPE_DISCONNECT_RESPONSE);
                                 Log.Debug($"Disconnect requested: {reason}");
                                 Reconnect();
@@ -594,9 +602,11 @@ public class BacnetPtpProtocolTransport : BacnetTransportBase
                                 //good
                                 break;
                         }
+
                         break;
                 }
             }
+
             Log.Debug("PTP thread is closing down");
         }
         catch (Exception ex)

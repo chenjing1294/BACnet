@@ -17,23 +17,24 @@ public struct DeviceReportingRecipient : ASN1.IEncode
         Id = new BacnetObjectId();
         adr = null;
 
-        WeekofDay = (BacnetBitString)v0.Value;
-        fromTime = (DateTime)v1.Value;
-        toTime = (DateTime)v2.Value;
+        WeekofDay = (BacnetBitString) v0.Value;
+        fromTime = (DateTime) v1.Value;
+        toTime = (DateTime) v2.Value;
         if (v3.Value is BacnetObjectId id)
         {
             Id = id;
         }
         else
         {
-            var netdescr = (BacnetValue[])v3.Value;
-            var s = (ushort)(uint)netdescr[0].Value;
-            var b = (byte[])netdescr[1].Value;
+            var netdescr = (BacnetValue[]) v3.Value;
+            var s = (ushort) (uint) netdescr[0].Value;
+            var b = (byte[]) netdescr[1].Value;
             adr = new BacnetAddress(BacnetAddressTypes.IP, s, b);
         }
-        processIdentifier = (uint)v4.Value;
-        Ack_Required = (bool)v5.Value;
-        evenType = (BacnetBitString)v6.Value;
+
+        processIdentifier = (uint) v4.Value;
+        Ack_Required = (bool) v5.Value;
+        evenType = (BacnetBitString) v6.Value;
     }
 
     public DeviceReportingRecipient(BacnetBitString weekofDay, DateTime fromTime, DateTime toTime, BacnetObjectId id, uint processIdentifier, bool ackRequired, BacnetBitString evenType)

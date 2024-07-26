@@ -7,14 +7,18 @@ public class BVLCV6
 {
     public const byte BVLL_TYPE_BACNET_IPV6 = 0x82;
     public const byte BVLC_HEADER_LENGTH = 10; // Not all the time, could be 7 for bacnet broadcast
+
     public const BacnetMaxAdpu BVLC_MAX_APDU = BacnetMaxAdpu.MAX_APDU1476;
+
     // Contains the rules to accept FRD based on the IP adress
     // If empty it's equal to * , everyone allows
     private readonly List<Regex> _autorizedFDR = new();
 
     private bool _bbmdFdServiceActivated;
     private readonly List<IPEndPoint> _bbmds = new();
+
     private readonly BacnetAddress _broadcastAdd;
+
     // Two lists for optional BBMD activity
     private readonly List<KeyValuePair<IPEndPoint, DateTime>> _foreignDevices = new();
     private readonly BacnetIpV6UdpProtocolTransport _myTransport;
@@ -32,7 +36,7 @@ public class BVLCV6
         {
             RandomVmac = true;
             new Random().NextBytes(VMAC);
-            VMAC[0] = (byte)((VMAC[0] & 0x7F) | 0x40); // ensure 01xxxxxx on the High byte    
+            VMAC[0] = (byte) ((VMAC[0] & 0x7F) | 0x40); // ensure 01xxxxxx on the High byte    
 
             // Open with default interface specified, cannot send it or 
             // it will generate an uncheckable continuous local loopback
@@ -43,9 +47,9 @@ public class BVLCV6
         }
         else // Device Id is the Vmac Id
         {
-            VMAC[0] = (byte)((vMac >> 16) & 0x3F); // ensure the 2 high bits are 0 on the High byte
-            VMAC[1] = (byte)((vMac >> 8) & 0xFF);
-            VMAC[2] = (byte)(vMac & 0xFF);
+            VMAC[0] = (byte) ((vMac >> 16) & 0x3F); // ensure the 2 high bits are 0 on the High byte
+            VMAC[1] = (byte) ((vMac >> 8) & 0xFF);
+            VMAC[2] = (byte) (vMac & 0xFF);
             // unicity is guaranteed by the end user !
         }
     }
@@ -152,9 +156,9 @@ public class BVLCV6
     private void First7BytesHeaderEncode(byte[] b, BacnetBvlcV6Functions function, int msgLength)
     {
         b[0] = BVLL_TYPE_BACNET_IPV6;
-        b[1] = (byte)function;
-        b[2] = (byte)((msgLength & 0xFF00) >> 8);
-        b[3] = (byte)((msgLength & 0x00FF) >> 0);
+        b[1] = (byte) function;
+        b[2] = (byte) ((msgLength & 0xFF00) >> 8);
+        b[3] = (byte) ((msgLength & 0x00FF) >> 0);
         Array.Copy(VMAC, 0, b, 4, 3);
     }
 
@@ -163,8 +167,8 @@ public class BVLCV6
     {
         var b = new byte[9];
         First7BytesHeaderEncode(b, BacnetBvlcV6Functions.BVLC_RESULT, 9);
-        b[7] = (byte)(((ushort)resultCode & 0xFF00) >> 8);
-        b[8] = (byte)((ushort)resultCode & 0xFF);
+        b[7] = (byte) (((ushort) resultCode & 0xFF00) >> 8);
+        b[8] = (byte) ((ushort) resultCode & 0xFF);
         _myTransport.Send(b, 9, sender);
     }
 
@@ -172,8 +176,8 @@ public class BVLCV6
     {
         var b = new byte[9];
         First7BytesHeaderEncode(b, BacnetBvlcV6Functions.BVLC_REGISTER_FOREIGN_DEVICE, 9);
-        b[7] = (byte)((ttl & 0xFF00) >> 8);
-        b[8] = (byte)(ttl & 0xFF);
+        b[7] = (byte) ((ttl & 0xFF00) >> 8);
+        b[8] = (byte) (ttl & 0xFF);
         _myTransport.Send(b, 9, bbmd);
     }
 
@@ -238,7 +242,7 @@ public class BVLCV6
         // offset always 0, we are the first after udp
         // and a previous test by the caller guaranteed at least 4 bytes into the buffer
 
-        function = (BacnetBvlcV6Functions)buffer[1];
+        function = (BacnetBvlcV6Functions) buffer[1];
         msgLength = (buffer[2] << 8) | (buffer[3] << 0);
         if (buffer[0] != BVLL_TYPE_BACNET_IPV6 || buffer.Length != msgLength) return -1;
 
@@ -263,13 +267,15 @@ public class BVLCV6
                 if (VMAC[0] == buffer[7] && VMAC[1] == buffer[8] && VMAC[2] == buffer[9])
                     // coming from myself ? avoid loopback
                     if (!_myTransport.LocalEndPoint.Equals(sender))
-                        SendAddressResolutionAck(sender, remoteAddress.VMac,
+                        SendAddressResolutionAck(
+                            sender, remoteAddress.VMac,
                             BacnetBvlcV6Functions.BVLC_ADDRESS_RESOLUTION_ACK);
                 return 0; // not for the upper layers
 
             case BacnetBvlcV6Functions.BVLC_FORWARDED_ADDRESS_RESOLUTION:
                 // no need to verify the target VMAC, should be OK
-                SendAddressResolutionAck(sender, remoteAddress.VMac,
+                SendAddressResolutionAck(
+                    sender, remoteAddress.VMac,
                     BacnetBvlcV6Functions.BVLC_ADDRESS_RESOLUTION_ACK);
                 return 0; // not for the upper layers
 
@@ -277,13 +283,15 @@ public class BVLCV6
                 if (VMAC[0] == buffer[4] && VMAC[1] == buffer[5] && VMAC[2] == buffer[6] && RandomVmac)
                 {
                     new Random().NextBytes(VMAC);
-                    VMAC[0] = (byte)((VMAC[0] & 0x7F) | 0x40);
+                    VMAC[0] = (byte) ((VMAC[0] & 0x7F) | 0x40);
                     SendAddressResolutionRequest(VMAC);
                 }
+
                 return 0; // not for the upper layers
 
             case BacnetBvlcV6Functions.BVLC_VIRTUAL_ADDRESS_RESOLUTION:
-                SendAddressResolutionAck(sender, remoteAddress.VMac,
+                SendAddressResolutionAck(
+                    sender, remoteAddress.VMac,
                     BacnetBvlcV6Functions.BVLC_VIRTUAL_ADDRESS_RESOLUTION_ACK);
                 return 0; // not for the upper layers
 
@@ -299,19 +307,20 @@ public class BVLCV6
                     bool ret;
                     lock (_bbmds)
                         ret = _bbmds.Exists(items => items.Equals(sender)); // verify sender presence in the table
-                                                                            // avoid also loopback
+                    // avoid also loopback
 
                     if (ret) // message from a know BBMD address, sent to all FDs and broadcast
                     {
                         SendToFDs(buffer, msgLength); // send without modification
-                                                      // Assume all BVLC_FORWARDED_NPDU are directly sent to me in the 
-                                                      // unicast mode and not by the way of the multicast address
-                                                      // If not, it's not really a big problem, devices on the local net will 
-                                                      // receive two times the message (after all it's just WhoIs, Iam, ...)
+                        // Assume all BVLC_FORWARDED_NPDU are directly sent to me in the 
+                        // unicast mode and not by the way of the multicast address
+                        // If not, it's not really a big problem, devices on the local net will 
+                        // receive two times the message (after all it's just WhoIs, Iam, ...)
                         BacnetIpV6UdpProtocolTransport.Convert(_broadcastAdd, out IPEndPoint ep);
                         _myTransport.Send(buffer, msgLength, ep);
                     }
                 }
+
                 return 25; // for the upper layers
 
             case BacnetBvlcV6Functions.BVLC_REGISTER_FOREIGN_DEVICE:
@@ -321,6 +330,7 @@ public class BVLCV6
                     RegisterForeignDevice(sender, TTL);
                     SendResult(sender, BacnetBvlcV6Results.SUCCESSFUL_COMPLETION); // ack
                 }
+
                 return 0; // not for the upper layers
 
             case BacnetBvlcV6Functions.BVLC_DELETE_FOREIGN_DEVICE_TABLE_ENTRY:
@@ -341,6 +351,7 @@ public class BVLCV6
                             SendResult(sender, BacnetBvlcV6Results.DISTRIBUTE_BROADCAST_TO_NETWORK_NAK);
                     }
                 }
+
                 return 0; // not for the upper layers
 
             // error encoding function or experimental one

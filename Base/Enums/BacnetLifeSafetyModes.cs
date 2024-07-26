@@ -19,6 +19,7 @@ public enum BacnetLifeSafetyModes
     LIFE_SAFETY_MODE_AUTOMATIC_RELEASE_DISABLED = 13,
     LIFE_SAFETY_MODE_DEFAULT = 14,
     MAX_LIFE_SAFETY_MODE = 15,
+
     /* Enumerated values 0-255 are reserved for definition by ASHRAE.  */
     /* Enumerated values 256-65535 may be used by others subject to  */
     /* procedures and constraints described in Clause 23. */

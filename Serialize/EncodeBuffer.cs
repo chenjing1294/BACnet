@@ -2,11 +2,11 @@
 
 public class EncodeBuffer
 {
-    public byte[] buffer;           //buffer to serialize into
-    public int offset;              //offset in buffer ... will go beyond max_offset (so that you may count what's needed)
-    public int max_offset;          //don't write beyond this offset 
-    public int serialize_counter;   //used with 'min_limit'
-    public int min_limit;           //don't write before this limit (used for segmentation)
+    public byte[] buffer; //buffer to serialize into
+    public int offset; //offset in buffer ... will go beyond max_offset (so that you may count what's needed)
+    public int max_offset; //don't write beyond this offset 
+    public int serialize_counter; //used with 'min_limit'
+    public int min_limit; //don't write before this limit (used for segmentation)
     public EncodeResult result;
     public bool expandable;
 

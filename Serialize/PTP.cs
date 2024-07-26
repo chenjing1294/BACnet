@@ -13,17 +13,18 @@ public class PTP
     {
         buffer[offset + 0] = PTP_PREAMBLE1;
         buffer[offset + 1] = PTP_PREAMBLE2;
-        buffer[offset + 2] = (byte)frameType;
-        buffer[offset + 3] = (byte)((msgLength & 0xFF00) >> 8);
-        buffer[offset + 4] = (byte)((msgLength & 0x00FF) >> 0);
+        buffer[offset + 2] = (byte) frameType;
+        buffer[offset + 3] = (byte) ((msgLength & 0xFF00) >> 8);
+        buffer[offset + 4] = (byte) ((msgLength & 0x00FF) >> 0);
         buffer[offset + 5] = MSTP.CRC_Calc_Header(buffer, offset + 2, 3);
         if (msgLength > 0)
         {
             //calculate data crc
             var dataCrc = MSTP.CRC_Calc_Data(buffer, offset + 6, msgLength);
-            buffer[offset + 6 + msgLength + 0] = (byte)(dataCrc & 0xFF);  //LSB first!
-            buffer[offset + 6 + msgLength + 1] = (byte)(dataCrc >> 8);
+            buffer[offset + 6 + msgLength + 0] = (byte) (dataCrc & 0xFF); //LSB first!
+            buffer[offset + 6 + msgLength + 1] = (byte) (dataCrc >> 8);
         }
+
         return PTP_HEADER_LENGTH + msgLength + (msgLength > 0 ? 2 : 0);
     }
 
@@ -33,10 +34,10 @@ public class PTP
         {
             frameType = BacnetPtpFrameTypes.FRAME_TYPE_CONNECT_REQUEST; // don't care
             msgLength = 0;
-            return -1;     //not enough data
+            return -1; //not enough data
         }
 
-        frameType = (BacnetPtpFrameTypes)buffer[offset + 2];
+        frameType = (BacnetPtpFrameTypes) buffer[offset + 2];
         msgLength = (buffer[offset + 3] << 8) | (buffer[offset + 4] << 0);
         var crcHeader = buffer[offset + 5];
         ushort crcData = 0;
@@ -46,7 +47,7 @@ public class PTP
             if (offset + 6 + msgLength + 1 >= buffer.Length)
                 return -1;
 
-            crcData = (ushort)((buffer[offset + 6 + msgLength + 1] << 8) | (buffer[offset + 6 + msgLength + 0] << 0));
+            crcData = (ushort) ((buffer[offset + 6 + msgLength + 1] << 8) | (buffer[offset + 6 + msgLength + 0] << 0));
         }
 
         if (buffer[offset + 0] != PTP_PREAMBLE1)
@@ -63,5 +64,4 @@ public class PTP
 
         return 8 + msgLength + (msgLength > 0 ? 2 : 0);
     }
-
 }

@@ -2,7 +2,7 @@ namespace System.IO.BACnet;
 
 public enum BacnetCharacterStringEncodings
 {
-    CHARACTER_ANSI_X34 = 0,  /* deprecated : Addendum 135-2008k  */
+    CHARACTER_ANSI_X34 = 0, /* deprecated : Addendum 135-2008k  */
     CHARACTER_UTF8 = 0,
     CHARACTER_MS_DBCS = 1,
     CHARACTER_JISC_6226 = 2, /* deprecated : Addendum 135-2008k  */

@@ -3,7 +3,7 @@
 public struct BacnetPropertyReference
 {
     public uint propertyIdentifier;
-    public uint propertyArrayIndex;        /* optional */
+    public uint propertyArrayIndex; /* optional */
 
     public BacnetPropertyReference(uint id, uint arrayIndex)
     {
@@ -13,7 +13,7 @@ public struct BacnetPropertyReference
 
     public BacnetPropertyIds GetPropertyId()
     {
-        return (BacnetPropertyIds)propertyIdentifier;
+        return (BacnetPropertyIds) propertyIdentifier;
     }
 
     public override string ToString()

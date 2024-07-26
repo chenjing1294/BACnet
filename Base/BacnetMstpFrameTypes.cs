@@ -12,6 +12,7 @@ public enum BacnetMstpFrameTypes : byte
     FRAME_TYPE_BACNET_DATA_EXPECTING_REPLY = 5,
     FRAME_TYPE_BACNET_DATA_NOT_EXPECTING_REPLY = 6,
     FRAME_TYPE_REPLY_POSTPONED = 7,
+
     /* Frame Types 128 through 255: Proprietary Frames */
     /* These frames are available to vendors as proprietary (non-BACnet) frames. */
     /* The first two octets of the Data field shall specify the unique vendor */

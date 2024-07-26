@@ -25,6 +25,7 @@ public enum BacnetNetworkMessageTypes : byte
     NETWORK_MESSAGE_REQUEST_MASTER_KEY = 16,
     NETWORK_MESSAGE_SET_MASTER_KEY = 17,
     NETWORK_MESSAGE_WHAT_IS_NETWORK_NUMBER = 18,
+
     NETWORK_MESSAGE_NETWORK_NUMBER_IS = 19
     /* X'0A' to X'7F': Reserved for use by ASHRAE, */
     /* X'80' to X'FF': Available for vendor proprietary messages */

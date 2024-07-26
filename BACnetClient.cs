@@ -1,28 +1,29 @@
 /**************************************************************************
-*                           MIT License
-* 
-* Copyright (C) 2014 Morten Kvistgaard <mk@pch-engineering.dk>
-*
-* Permission is hereby granted, free of charge, to any person obtaining
-* a copy of this software and associated documentation files (the
-* "Software"), to deal in the Software without restriction, including
-* without limitation the rights to use, copy, modify, merge, publish,
-* distribute, sublicense, and/or sell copies of the Software, and to
-* permit persons to whom the Software is furnished to do so, subject to
-* the following conditions:
-*
-* The above copyright notice and this permission notice shall be included
-* in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*
-*********************************************************************/
+ *                           MIT License
+ *
+ * Copyright (C) 2014 Morten Kvistgaard <mk@pch-engineering.dk>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *********************************************************************/
+
 using System.Collections.Concurrent;
 
 namespace System.IO.BACnet;
@@ -45,6 +46,7 @@ public class BacnetClient : IDisposable
     /// TODO: invoke-id should be PER (remote) DEVICE!
     /// </summary>
     private Dictionary<byte, List<Tuple<byte, byte[]>>> _segmentsPerInvokeId = new();
+
     private ConcurrentDictionary<byte, object> _locksPerInvokeId = new();
     private Dictionary<byte, byte> _expectedSegmentsPerInvokeId = new();
 
@@ -74,7 +76,10 @@ public class BacnetClient : IDisposable
     public uint WritePriority
     {
         get => _writepriority;
-        set { if (value < 17) _writepriority = value; }
+        set
+        {
+            if (value < 17) _writepriority = value;
+        }
     }
 
     // These members allows to access undecoded buffer by the application
@@ -90,6 +95,7 @@ public class BacnetClient : IDisposable
         public EncodeBuffer buffer;
         public byte sequence_number;
         public byte window_size;
+
         public byte max_segments;
         // ReSharper restore InconsistentNaming
     }
@@ -126,6 +132,7 @@ public class BacnetClient : IDisposable
                 if (!_wait.WaitOne(timeout)) return false;
                 Monitor.Enter(_lockObject);
             }
+
             Monitor.Exit(_lockObject);
             _address = null;
             return true;
@@ -172,38 +179,71 @@ public class BacnetClient : IDisposable
     }
 
     public delegate void ConfirmedServiceRequestHandler(BacnetClient sender, BacnetAddress adr, BacnetPduTypes type, BacnetConfirmedServices service, BacnetMaxSegments maxSegments, BacnetMaxAdpu maxAdpu, byte invokeId, byte[] buffer, int offset, int length);
+
     public event ConfirmedServiceRequestHandler OnConfirmedServiceRequest;
+
     public delegate void ReadPropertyRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, BacnetObjectId objectId, BacnetPropertyReference property, BacnetMaxSegments maxSegments);
+
     public event ReadPropertyRequestHandler OnReadPropertyRequest;
+
     public delegate void ReadPropertyMultipleRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, IList<BacnetReadAccessSpecification> properties, BacnetMaxSegments maxSegments);
+
     public event ReadPropertyMultipleRequestHandler OnReadPropertyMultipleRequest;
+
     public delegate void WritePropertyRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, BacnetObjectId objectId, BacnetPropertyValue value, BacnetMaxSegments maxSegments);
+
     public event WritePropertyRequestHandler OnWritePropertyRequest;
+
     public delegate void WritePropertyMultipleRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, BacnetObjectId objectId, ICollection<BacnetPropertyValue> values, BacnetMaxSegments maxSegments);
+
     public event WritePropertyMultipleRequestHandler OnWritePropertyMultipleRequest;
+
     public delegate void AtomicWriteFileRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, bool isStream, BacnetObjectId objectId, int position, uint blockCount, byte[][] blocks, int[] counts, BacnetMaxSegments maxSegments);
+
     public event AtomicWriteFileRequestHandler OnAtomicWriteFileRequest;
+
     public delegate void AtomicReadFileRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, bool isStream, BacnetObjectId objectId, int position, uint count, BacnetMaxSegments maxSegments);
+
     public event AtomicReadFileRequestHandler OnAtomicReadFileRequest;
+
     public delegate void SubscribeCOVRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, uint subscriberProcessIdentifier, BacnetObjectId monitoredObjectIdentifier, bool cancellationRequest, bool issueConfirmedNotifications, uint lifetime, BacnetMaxSegments maxSegments);
+
     public event SubscribeCOVRequestHandler OnSubscribeCOV;
+
     public delegate void EventNotificationCallbackHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, BacnetEventNotificationData eventData, bool needConfirm);
+
     public event EventNotificationCallbackHandler OnEventNotify;
+
     public delegate void SubscribeCOVPropertyRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, uint subscriberProcessIdentifier, BacnetObjectId monitoredObjectIdentifier, BacnetPropertyReference monitoredProperty, bool cancellationRequest, bool issueConfirmedNotifications, uint lifetime, float covIncrement, BacnetMaxSegments maxSegments);
+
     public event SubscribeCOVPropertyRequestHandler OnSubscribeCOVProperty;
+
     public delegate void DeviceCommunicationControlRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, uint timeDuration, uint enableDisable, string password, BacnetMaxSegments maxSegments);
+
     public event DeviceCommunicationControlRequestHandler OnDeviceCommunicationControl;
+
     public delegate void ReinitializedRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, BacnetReinitializedStates state, string password, BacnetMaxSegments maxSegments);
+
     public event ReinitializedRequestHandler OnReinitializedDevice;
+
     public delegate void ReadRangeHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, BacnetObjectId objectId, BacnetPropertyReference property, BacnetReadRangeRequestTypes requestType, uint position, DateTime time, int count, BacnetMaxSegments maxSegments);
+
     public event ReadRangeHandler OnReadRange;
+
     public delegate void CreateObjectRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, BacnetObjectId objectId, ICollection<BacnetPropertyValue> values, BacnetMaxSegments maxSegments);
+
     public event CreateObjectRequestHandler OnCreateObjectRequest;
+
     public delegate void DeleteObjectRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, BacnetObjectId objectId, BacnetMaxSegments maxSegments);
+
     public event DeleteObjectRequestHandler OnDeleteObjectRequest;
+
     public delegate void GetAlarmSummaryOrEventInformationRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, bool getEvent, BacnetObjectId objectId, BacnetMaxAdpu maxApdu, BacnetMaxSegments max_segments);
+
     public event GetAlarmSummaryOrEventInformationRequestHandler OnGetAlarmSummaryOrEventInformation;
+
     public delegate void AlarmAcknowledgeRequestHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, uint ackProcessIdentifier, BacnetObjectId eventObjectIdentifier, uint eventStateAcked, string ackSource, BacnetGenericTime eventTimeStamp, BacnetGenericTime ackTimeStamp);
+
     public event AlarmAcknowledgeRequestHandler OnAlarmAcknowledge;
 
     protected void ProcessConfirmedServiceRequest(BacnetAddress address, BacnetPduTypes type, BacnetConfirmedServices service, BacnetMaxSegments maxSegments, BacnetMaxAdpu maxAdpu, byte invokeId, byte[] buffer, int offset, int length)
@@ -244,6 +284,7 @@ public class BacnetClient : IDisposable
                             SendConfirmedServiceReject(address, invokeId, BacnetRejectReason.TOO_MANY_ARGUMENTS);
                             break;
                     }
+
                     Log.Warn("Couldn't decode DecodeReadProperty");
                 }
             }
@@ -492,18 +533,28 @@ public class BacnetClient : IDisposable
     }
 
     public delegate void UnconfirmedServiceRequestHandler(BacnetClient sender, BacnetAddress adr, BacnetPduTypes type, BacnetUnconfirmedServices service, byte[] buffer, int offset, int length);
+
     public event UnconfirmedServiceRequestHandler OnUnconfirmedServiceRequest;
+
     public delegate void WhoHasHandler(BacnetClient sender, BacnetAddress adr, int lowLimit, int highLimit, BacnetObjectId? objId, string objName);
+
     public event WhoHasHandler OnWhoHas;
+
     public delegate void IamHandler(BacnetClient sender, BacnetAddress adr, uint deviceId, uint maxAPDU, BacnetSegmentations segmentation, ushort vendorId);
+
     public event IamHandler OnIam;
+
     public delegate void WhoIsHandler(BacnetClient sender, BacnetAddress adr, int lowLimit, int highLimit);
+
     public event WhoIsHandler OnWhoIs;
+
     public delegate void TimeSynchronizeHandler(BacnetClient sender, BacnetAddress adr, DateTime dateTime, bool utc);
+
     public event TimeSynchronizeHandler OnTimeSynchronize;
 
     //used by both 'confirmed' and 'unconfirmed' notify
     public delegate void COVNotificationHandler(BacnetClient sender, BacnetAddress adr, byte invokeId, uint subscriberProcessIdentifier, BacnetObjectId initiatingDeviceIdentifier, BacnetObjectId monitoredObjectIdentifier, uint timeRemaining, bool needConfirm, ICollection<BacnetPropertyValue> values, BacnetMaxSegments maxSegments);
+
     public event COVNotificationHandler OnCOVNotification;
 
     protected void ProcessUnconfirmedServiceRequest(BacnetAddress address, BacnetPduTypes type, BacnetUnconfirmedServices service, byte[] buffer, int offset, int length)
@@ -575,6 +626,7 @@ public class BacnetClient : IDisposable
     }
 
     public delegate void SimpleAckHandler(BacnetClient sender, BacnetAddress adr, BacnetPduTypes type, BacnetConfirmedServices service, byte invokeId, byte[] data, int dataOffset, int dataLength);
+
     public event SimpleAckHandler OnSimpleAck;
 
     protected void ProcessSimpleAck(BacnetAddress adr, BacnetPduTypes type, BacnetConfirmedServices service, byte invokeId, byte[] buffer, int offset, int length)
@@ -591,6 +643,7 @@ public class BacnetClient : IDisposable
     }
 
     public delegate void ComplexAckHandler(BacnetClient sender, BacnetAddress adr, BacnetPduTypes type, BacnetConfirmedServices service, byte invokeId, byte[] buffer, int offset, int length);
+
     public event ComplexAckHandler OnComplexAck;
 
     protected void ProcessComplexAck(BacnetAddress adr, BacnetPduTypes type, BacnetConfirmedServices service, byte invokeId, byte[] buffer, int offset, int length)
@@ -607,6 +660,7 @@ public class BacnetClient : IDisposable
     }
 
     public delegate void ErrorHandler(BacnetClient sender, BacnetAddress adr, BacnetPduTypes type, BacnetConfirmedServices service, byte invokeId, BacnetErrorClasses errorClass, BacnetErrorCodes errorCode, byte[] buffer, int offset, int length);
+
     public event ErrorHandler OnError;
 
     protected void ProcessError(BacnetAddress adr, BacnetPduTypes type, BacnetConfirmedServices service, byte invokeId, byte[] buffer, int offset, int length)
@@ -629,6 +683,7 @@ public class BacnetClient : IDisposable
     }
 
     public delegate void AbortHandler(BacnetClient sender, BacnetAddress adr, BacnetPduTypes type, byte invokeId, BacnetAbortReason reason, byte[] buffer, int offset, int length);
+
     public event AbortHandler OnAbort;
 
     protected void ProcessAbort(BacnetAddress adr, BacnetPduTypes type, byte invokeId, BacnetAbortReason reason, byte[] buffer, int offset, int length)
@@ -645,6 +700,7 @@ public class BacnetClient : IDisposable
     }
 
     public delegate void RejectHandler(BacnetClient sender, BacnetAddress adr, BacnetPduTypes type, byte invokeId, BacnetRejectReason reason, byte[] buffer, int offset, int length);
+
     public event RejectHandler OnReject;
 
     protected void ProcessReject(BacnetAddress adr, BacnetPduTypes type, byte invokeId, BacnetRejectReason reason, byte[] buffer, int offset, int length)
@@ -661,6 +717,7 @@ public class BacnetClient : IDisposable
     }
 
     public delegate void SegmentAckHandler(BacnetClient sender, BacnetAddress adr, BacnetPduTypes type, byte originalInvokeId, byte sequenceNumber, byte actualWindowSize, byte[] buffer, int offset, int length);
+
     public event SegmentAckHandler OnSegmentAck;
 
     protected void ProcessSegmentAck(BacnetAddress adr, BacnetPduTypes type, byte originalInvokeId, byte sequenceNumber, byte actualWindowSize, byte[] buffer, int offset, int length)
@@ -677,13 +734,15 @@ public class BacnetClient : IDisposable
     }
 
     public delegate void SegmentHandler(BacnetClient sender, BacnetAddress adr, BacnetPduTypes type, BacnetConfirmedServices service, byte invokeId, BacnetMaxSegments maxSegments, BacnetMaxAdpu maxAdpu, byte sequenceNumber, byte[] buffer, int offset, int length);
+
     public event SegmentHandler OnSegment;
 
     private void ProcessSegment(BacnetAddress address, BacnetPduTypes type, BacnetConfirmedServices service, byte invokeId, BacnetMaxSegments maxSegments, BacnetMaxAdpu maxAdpu, bool server, byte sequenceNumber, byte proposedWindowNumber, byte[] buffer, int offset, int length)
     {
         lock (_locksPerInvokeId.GetOrAdd(invokeId, () => new object()))
         {
-            ProcessSegmentLocked(address, type, service, invokeId, maxSegments, maxAdpu, server, sequenceNumber,
+            ProcessSegmentLocked(
+                address, type, service, invokeId, maxSegments, maxAdpu, server, sequenceNumber,
                 proposedWindowNumber, buffer, offset, length);
         }
     }
@@ -703,7 +762,7 @@ public class BacnetClient : IDisposable
         var moreFollows = (type & BacnetPduTypes.MORE_FOLLOWS) == BacnetPduTypes.MORE_FOLLOWS;
 
         if (!moreFollows)
-            _expectedSegmentsPerInvokeId[invokeId] = (byte)(sequenceNumber + 1);
+            _expectedSegmentsPerInvokeId[invokeId] = (byte) (sequenceNumber + 1);
 
         //send ACK
         if (sequenceNumber % proposedWindowNumber == 0 || !moreFollows)
@@ -771,98 +830,102 @@ public class BacnetClient : IDisposable
         switch (type & BacnetPduTypes.PDU_TYPE_MASK)
         {
             case BacnetPduTypes.PDU_TYPE_UNCONFIRMED_SERVICE_REQUEST:
-                {
-                    var apduHeaderLen = APDU.DecodeUnconfirmedServiceRequest(buffer, offset, out type, out var service);
-                    offset += apduHeaderLen;
-                    length -= apduHeaderLen;
-                    ProcessUnconfirmedServiceRequest(adr, type, service, buffer, offset, length);
-                }
+            {
+                var apduHeaderLen = APDU.DecodeUnconfirmedServiceRequest(buffer, offset, out type, out var service);
+                offset += apduHeaderLen;
+                length -= apduHeaderLen;
+                ProcessUnconfirmedServiceRequest(adr, type, service, buffer, offset, length);
+            }
                 break;
 
             case BacnetPduTypes.PDU_TYPE_SIMPLE_ACK:
-                {
-                    var apduHeaderLen = APDU.DecodeSimpleAck(buffer, offset, out type, out var service, out var invokeId);
-                    offset += apduHeaderLen;
-                    length -= apduHeaderLen;
-                    ProcessSimpleAck(adr, type, service, invokeId, buffer, offset, length);
-                }
+            {
+                var apduHeaderLen = APDU.DecodeSimpleAck(buffer, offset, out type, out var service, out var invokeId);
+                offset += apduHeaderLen;
+                length -= apduHeaderLen;
+                ProcessSimpleAck(adr, type, service, invokeId, buffer, offset, length);
+            }
                 break;
 
             case BacnetPduTypes.PDU_TYPE_COMPLEX_ACK:
-                {
-                    var apduHeaderLen = APDU.DecodeComplexAck(buffer, offset, out type, out var service, out var invokeId,
-                        out var sequenceNumber, out var proposedWindowNumber);
+            {
+                var apduHeaderLen = APDU.DecodeComplexAck(
+                    buffer, offset, out type, out var service, out var invokeId,
+                    out var sequenceNumber, out var proposedWindowNumber);
 
-                    offset += apduHeaderLen;
-                    length -= apduHeaderLen;
-                    if ((type & BacnetPduTypes.SEGMENTED_MESSAGE) == 0) //don't process segmented messages here
-                    {
-                        ProcessComplexAck(adr, type, service, invokeId, buffer, offset, length);
-                    }
-                    else
-                    {
-                        ProcessSegment(adr, type, service, invokeId, BacnetMaxSegments.MAX_SEG0, BacnetMaxAdpu.MAX_APDU50, false,
-                            sequenceNumber, proposedWindowNumber, buffer, offset, length);
-                    }
+                offset += apduHeaderLen;
+                length -= apduHeaderLen;
+                if ((type & BacnetPduTypes.SEGMENTED_MESSAGE) == 0) //don't process segmented messages here
+                {
+                    ProcessComplexAck(adr, type, service, invokeId, buffer, offset, length);
                 }
+                else
+                {
+                    ProcessSegment(
+                        adr, type, service, invokeId, BacnetMaxSegments.MAX_SEG0, BacnetMaxAdpu.MAX_APDU50, false,
+                        sequenceNumber, proposedWindowNumber, buffer, offset, length);
+                }
+            }
                 break;
 
             case BacnetPduTypes.PDU_TYPE_SEGMENT_ACK:
-                {
-                    var apduHeaderLen = APDU.DecodeSegmentAck(buffer, offset, out type, out var originalInvokeId,
-                        out var sequenceNumber, out var actualWindowSize);
+            {
+                var apduHeaderLen = APDU.DecodeSegmentAck(
+                    buffer, offset, out type, out var originalInvokeId,
+                    out var sequenceNumber, out var actualWindowSize);
 
-                    offset += apduHeaderLen;
-                    length -= apduHeaderLen;
-                    _lastSegmentAck.Set(adr, originalInvokeId, sequenceNumber, actualWindowSize);
-                    ProcessSegmentAck(adr, type, originalInvokeId, sequenceNumber, actualWindowSize, buffer, offset, length);
-                }
+                offset += apduHeaderLen;
+                length -= apduHeaderLen;
+                _lastSegmentAck.Set(adr, originalInvokeId, sequenceNumber, actualWindowSize);
+                ProcessSegmentAck(adr, type, originalInvokeId, sequenceNumber, actualWindowSize, buffer, offset, length);
+            }
                 break;
 
             case BacnetPduTypes.PDU_TYPE_ERROR:
-                {
-                    var apduHeaderLen = APDU.DecodeError(buffer, offset, out type, out var service, out var invokeId);
-                    offset += apduHeaderLen;
-                    length -= apduHeaderLen;
-                    ProcessError(adr, type, service, invokeId, buffer, offset, length);
-                }
+            {
+                var apduHeaderLen = APDU.DecodeError(buffer, offset, out type, out var service, out var invokeId);
+                offset += apduHeaderLen;
+                length -= apduHeaderLen;
+                ProcessError(adr, type, service, invokeId, buffer, offset, length);
+            }
                 break;
 
             case BacnetPduTypes.PDU_TYPE_ABORT:
-                {
-                    var apduHeaderLen = APDU.DecodeAbort(buffer, offset, out type, out var invokeId, out var reason);
-                    offset += apduHeaderLen;
-                    length -= apduHeaderLen;
-                    ProcessAbort(adr, type, invokeId, reason, buffer, offset, length);
-                }
+            {
+                var apduHeaderLen = APDU.DecodeAbort(buffer, offset, out type, out var invokeId, out var reason);
+                offset += apduHeaderLen;
+                length -= apduHeaderLen;
+                ProcessAbort(adr, type, invokeId, reason, buffer, offset, length);
+            }
                 break;
 
             case BacnetPduTypes.PDU_TYPE_REJECT:
-                {
-                    var apduHeaderLen = APDU.DecodeReject(buffer, offset, out type, out var invokeId, out var reason);
-                    offset += apduHeaderLen;
-                    length -= apduHeaderLen;
-                    ProcessReject(adr, type, invokeId, reason, buffer, offset, length);
-                }
+            {
+                var apduHeaderLen = APDU.DecodeReject(buffer, offset, out type, out var invokeId, out var reason);
+                offset += apduHeaderLen;
+                length -= apduHeaderLen;
+                ProcessReject(adr, type, invokeId, reason, buffer, offset, length);
+            }
                 break;
 
             case BacnetPduTypes.PDU_TYPE_CONFIRMED_SERVICE_REQUEST:
+            {
+                var apduHeaderLen = APDU.DecodeConfirmedServiceRequest(
+                    buffer, offset, out type, out var service,
+                    out var maxSegments, out var maxAdpu, out var invokeId, out var sequenceNumber, out var proposedWindowNumber);
+
+                offset += apduHeaderLen;
+                length -= apduHeaderLen;
+
+                if ((type & BacnetPduTypes.SEGMENTED_MESSAGE) == 0) //don't process segmented messages here
                 {
-                    var apduHeaderLen = APDU.DecodeConfirmedServiceRequest(buffer, offset, out type, out var service,
-                        out var maxSegments, out var maxAdpu, out var invokeId, out var sequenceNumber, out var proposedWindowNumber);
-
-                    offset += apduHeaderLen;
-                    length -= apduHeaderLen;
-
-                    if ((type & BacnetPduTypes.SEGMENTED_MESSAGE) == 0) //don't process segmented messages here
-                    {
-                        ProcessConfirmedServiceRequest(adr, type, service, maxSegments, maxAdpu, invokeId, buffer, offset, length);
-                    }
-                    else
-                    {
-                        ProcessSegment(adr, type, service, invokeId, maxSegments, maxAdpu, true, sequenceNumber, proposedWindowNumber, buffer, offset, length);
-                    }
+                    ProcessConfirmedServiceRequest(adr, type, service, maxSegments, maxAdpu, invokeId, buffer, offset, length);
                 }
+                else
+                {
+                    ProcessSegment(adr, type, service, invokeId, maxSegments, maxAdpu, true, sequenceNumber, proposedWindowNumber, buffer, offset, length);
+                }
+            }
                 break;
 
             default:
@@ -878,11 +941,13 @@ public class BacnetClient : IDisposable
         {
             adr = Transport.GetBroadcastAddress();
         }
+
         var b = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(b, BacnetNpduControls.NetworkLayerMessage, adr, null, 255, messageType, vendorId);
         b.Add(buffer, bufLen);
         Transport.Send(b.buffer, Transport.HeaderLength, b.offset - Transport.HeaderLength, adr, false, 0);
     }
+
     public void SendIAmRouterToNetwork(ushort[] networks)
     {
         var b = GetEncodeBuffer(0);
@@ -890,6 +955,7 @@ public class BacnetClient : IDisposable
         {
             ASN1.encode_unsigned16(b, networks[i]);
         }
+
         SendNetworkMessage(null, b.buffer, b.offset, BacnetNetworkMessageTypes.NETWORK_MESSAGE_I_AM_ROUTER_TO_NETWORK);
     }
 
@@ -903,8 +969,10 @@ public class BacnetClient : IDisposable
                 ASN1.encode_unsigned16(b, networks[i]);
             }
         }
+
         SendNetworkMessage(adr, b.buffer, b.offset, BacnetNetworkMessageTypes.NETWORK_MESSAGE_INIT_RT_TABLE_ACK);
     }
+
     public void SendRejectToNetwork(BacnetAddress adr, ushort[] networks)
     {
         var b = GetEncodeBuffer(0);
@@ -913,31 +981,56 @@ public class BacnetClient : IDisposable
         {
             ASN1.encode_unsigned16(b, networks[i]);
         }
+
         SendNetworkMessage(adr, b.buffer, b.offset, BacnetNetworkMessageTypes.NETWORK_MESSAGE_REJECT_MESSAGE_TO_NETWORK);
     }
+
     public delegate void NetworkMessageHandler(BacnetClient sender, BacnetAddress adr, BacnetNpduControls npduFunction, BacnetNetworkMessageTypes npduMessageType, byte[] buffer, int offset, int messageLength);
+
     public event NetworkMessageHandler OnNetworkMessage;
+
     public delegate void WhoIsRouterToNetworkHandler(BacnetClient sender, BacnetAddress adr, BacnetNpduControls npduFunction, byte[] buffer, int offset, int messageLength);
+
     public event WhoIsRouterToNetworkHandler OnWhoIsRouterToNetworkMessage;
+
     public delegate void IAmRouterToNetworkHandler(BacnetClient sender, BacnetAddress adr, BacnetNpduControls npduFunction, byte[] buffer, int offset, int messageLength);
+
     public event IAmRouterToNetworkHandler OnIAmRouterToNetworkMessage;
+
     public delegate void ICouldBeRouterToNetworkHandler(BacnetClient sender, BacnetAddress adr, BacnetNpduControls npduFunction, byte[] buffer, int offset, int messageLength);
+
     public event ICouldBeRouterToNetworkHandler OnICouldBeRouterToNetworkMessage;
+
     public delegate void RejectMessageToNetworkHandler(BacnetClient sender, BacnetAddress adr, BacnetNpduControls npduFunction, byte[] buffer, int offset, int messageLength);
+
     public event RejectMessageToNetworkHandler OnRejectMessageToNetworkMessage;
+
     public delegate void RouterBusyToNetworkHandler(BacnetClient sender, BacnetAddress adr, BacnetNpduControls npduFunction, byte[] buffer, int offset, int messageLength);
+
     public event RouterBusyToNetworkHandler OnRouterBusyToNetworkMessage;
+
     public delegate void RouterAvailableToNetworkHandler(BacnetClient sender, BacnetAddress adr, BacnetNpduControls npduFunction, byte[] buffer, int offset, int messageLength);
+
     public event RouterAvailableToNetworkHandler OnRouterAvailableToNetworkMessage;
+
     public delegate void InitRtTableToNetworkHandler(BacnetClient sender, BacnetAddress adr, BacnetNpduControls npduFunction, byte[] buffer, int offset, int messageLength);
+
     public event InitRtTableToNetworkHandler OnInitRtTableToNetworkMessage;
+
     public delegate void InitRtTableAckToNetworkHandler(BacnetClient sender, BacnetAddress adr, BacnetNpduControls npduFunction, byte[] buffer, int offset, int messageLength);
+
     public event InitRtTableAckToNetworkHandler OnInitRtTableAckToNetworkMessage;
+
     public delegate void EstablishConnectionToNetworkHandler(BacnetClient sender, BacnetAddress adr, BacnetNpduControls npduFunction, byte[] buffer, int offset, int messageLength);
+
     public event EstablishConnectionToNetworkHandler OnEstablishConnectionToNetworkMessage;
+
     public delegate void DisconnectConnectionToNetworkHandler(BacnetClient sender, BacnetAddress adr, BacnetNpduControls npduFunction, byte[] buffer, int offset, int messageLength);
+
     public event DisconnectConnectionToNetworkHandler OnDisconnectConnectionToNetworkMessage;
+
     public delegate void UnrecognizedNetworkHandler(BacnetClient sender, BacnetAddress adr, BacnetNpduControls npduFunction, byte[] buffer, int offset, int messageLength);
+
     public event UnrecognizedNetworkHandler OnUnrecognizedNetworkMessage;
 
     private void ProcessNetworkMessage(BacnetAddress adr, BacnetNpduControls npduFunction, BacnetNetworkMessageTypes npduMessageType, byte[] buffer, int offset, int messageLength)
@@ -1096,7 +1189,6 @@ public class BacnetClient : IDisposable
         {
             Log.Error("Error on Sending Whois to remote BBMD (Wrong Transport, not IP ?)", ex);
         }
-
     }
 
     public void WhoIs(int lowLimit = -1, int highLimit = -1, BacnetAddress receiver = null, BacnetAddress source = null)
@@ -1136,7 +1228,7 @@ public class BacnetClient : IDisposable
         var b = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(b, BacnetNpduControls.PriorityNormalMessage, receiver, source);
         APDU.EncodeUnconfirmedServiceRequest(b, BacnetPduTypes.PDU_TYPE_UNCONFIRMED_SERVICE_REQUEST, BacnetUnconfirmedServices.SERVICE_UNCONFIRMED_I_AM);
-        Services.EncodeIamBroadcast(b, deviceId, (uint)GetMaxApdu(), segmentation, VendorId);
+        Services.EncodeIamBroadcast(b, deviceId, (uint) GetMaxApdu(), segmentation, VendorId);
 
         Transport.Send(b.buffer, Transport.HeaderLength, b.offset - Transport.HeaderLength, receiver, false, 0);
     }
@@ -1203,7 +1295,7 @@ public class BacnetClient : IDisposable
         var b = GetEncodeBuffer(Transport.HeaderLength);
 
         NPDU.Encode(b, BacnetNpduControls.PriorityNormalMessage, adr.RoutedSource, adr.RoutedDestination);
-        APDU.EncodeError(b, BacnetPduTypes.PDU_TYPE_REJECT, (BacnetConfirmedServices)reason, invokeId);
+        APDU.EncodeError(b, BacnetPduTypes.PDU_TYPE_REJECT, (BacnetConfirmedServices) reason, invokeId);
         Transport.Send(b.buffer, Transport.HeaderLength, b.offset - Transport.HeaderLength, adr, false, 0);
     }
 
@@ -1215,7 +1307,7 @@ public class BacnetClient : IDisposable
         var b = GetEncodeBuffer(Transport.HeaderLength);
 
         NPDU.Encode(b, BacnetNpduControls.PriorityNormalMessage, adr.RoutedSource, adr.RoutedDestination);
-        APDU.EncodeError(b, BacnetPduTypes.PDU_TYPE_ABORT, (BacnetConfirmedServices)reason, invokeId);
+        APDU.EncodeError(b, BacnetPduTypes.PDU_TYPE_ABORT, (BacnetConfirmedServices) reason, invokeId);
         Transport.Send(b.buffer, Transport.HeaderLength, b.offset - Transport.HeaderLength, adr, false, 0);
     }
 
@@ -1225,7 +1317,8 @@ public class BacnetClient : IDisposable
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage, adr, source);
-        APDU.EncodeUnconfirmedServiceRequest(buffer, BacnetPduTypes.PDU_TYPE_UNCONFIRMED_SERVICE_REQUEST, dateTime.Kind == DateTimeKind.Utc
+        APDU.EncodeUnconfirmedServiceRequest(
+            buffer, BacnetPduTypes.PDU_TYPE_UNCONFIRMED_SERVICE_REQUEST, dateTime.Kind == DateTimeKind.Utc
                 ? BacnetUnconfirmedServices.SERVICE_UNCONFIRMED_UTC_TIME_SYNCHRONIZATION
                 : BacnetUnconfirmedServices.SERVICE_UNCONFIRMED_TIME_SYNCHRONIZATION);
         Services.EncodeTimeSync(buffer, dateTime);
@@ -1237,6 +1330,7 @@ public class BacnetClient : IDisposable
     {
         return GetMaxApdu(Transport.MaxAdpuLength);
     }
+
     // DAL
     public int GetMaxApdu(BacnetMaxAdpu apduLength)
     {
@@ -1267,7 +1361,7 @@ public class BacnetClient : IDisposable
 
         //max udp payload IRL seems to differ from the expectations in BACnet
         //so we have to adjust it. (In order to fulfill the standard)
-        const int maxNPDUHeaderLength = 4;       //usually it's '2', but it can also be more than '4'. Beware!
+        const int maxNPDUHeaderLength = 4; //usually it's '2', but it can also be more than '4'. Beware!
         return Math.Min(maxAPDU, Transport.MaxBufferLength - Transport.HeaderLength - maxNPDUHeaderLength);
     }
 
@@ -1280,7 +1374,7 @@ public class BacnetClient : IDisposable
 
     public bool WriteFileRequest(BacnetAddress adr, BacnetObjectId objectId, ref int position, int count, byte[] fileBuffer, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginWriteFileRequest(adr, objectId, position, count, fileBuffer, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginWriteFileRequest(adr, objectId, position, count, fileBuffer, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -1291,10 +1385,12 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
@@ -1302,12 +1398,12 @@ public class BacnetClient : IDisposable
     {
         Log.Debug("Sending AtomicWriteFileRequest");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
         APDU.EncodeConfirmedServiceRequest(buffer, PduConfirmedServiceRequest(), BacnetConfirmedServices.SERVICE_CONFIRMED_ATOMIC_WRITE_FILE, MaxSegments, Transport.MaxAdpuLength, invokeId);
-        Services.EncodeAtomicWriteFile(buffer, true, objectId, position, 1, new[] { fileBuffer }, new[] { count });
+        Services.EncodeAtomicWriteFile(buffer, true, objectId, position, 1, new[] {fileBuffer}, new[] {count});
 
         //send
         var ret = new BacnetAsyncResult(this, adr, invokeId, buffer.buffer, buffer.offset - Transport.HeaderLength, waitForTransmit, TransmitTimeout);
@@ -1318,7 +1414,7 @@ public class BacnetClient : IDisposable
 
     public void EndWriteFileRequest(IAsyncResult result, out int position, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -1341,7 +1437,7 @@ public class BacnetClient : IDisposable
     {
         Log.Debug("Sending AtomicReadFileRequest");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         //encode
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
@@ -1358,7 +1454,7 @@ public class BacnetClient : IDisposable
 
     public void EndReadFileRequest(IAsyncResult result, out uint count, out int position, out bool endOfFile, out byte[] fileBuffer, out int fileBufferOffset, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -1383,7 +1479,7 @@ public class BacnetClient : IDisposable
 
     public bool ReadFileRequest(BacnetAddress adr, BacnetObjectId objectId, ref int position, ref uint count, out bool endOfFile, out byte[] fileBuffer, out int fileBufferOffset, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginReadFileRequest(adr, objectId, position, count, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginReadFileRequest(adr, objectId, position, count, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -1394,10 +1490,12 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         position = -1;
         count = 0;
         fileBuffer = null;
@@ -1422,13 +1520,13 @@ public class BacnetClient : IDisposable
     {
         Log.Debug("Sending ReadRangeRequest");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         //encode
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
         APDU.EncodeConfirmedServiceRequest(buffer, PduConfirmedServiceRequest(), BacnetConfirmedServices.SERVICE_CONFIRMED_READ_RANGE, MaxSegments, Transport.MaxAdpuLength, invokeId);
-        Services.EncodeReadRange(buffer, objectId, (uint)BacnetPropertyIds.PROP_LOG_BUFFER, ASN1.BACNET_ARRAY_ALL, bacnetReadRangeRequestTypes, idxBegin, readFrom, (int)quantity);
+        Services.EncodeReadRange(buffer, objectId, (uint) BacnetPropertyIds.PROP_LOG_BUFFER, ASN1.BACNET_ARRAY_ALL, bacnetReadRangeRequestTypes, idxBegin, readFrom, (int) quantity);
         //send
         var ret = new BacnetAsyncResult(this, adr, invokeId, buffer.buffer, buffer.offset - Transport.HeaderLength, waitForTransmit, TransmitTimeout);
         ret.Resend();
@@ -1439,7 +1537,7 @@ public class BacnetClient : IDisposable
     // Fc
     public void EndReadRangeRequest(IAsyncResult result, out byte[] trendbuffer, out uint itemCount, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         itemCount = 0;
         trendbuffer = null;
 
@@ -1462,6 +1560,7 @@ public class BacnetClient : IDisposable
     {
         return ReadRangeRequestCore(BacnetReadRangeRequestTypes.RR_BY_TIME, adr, objectId, 1, readFrom, ref quantity, out range, invokeId);
     }
+
     public bool ReadRangeRequest(BacnetAddress adr, BacnetObjectId objectId, uint idxBegin, ref uint quantity, out byte[] range, byte invokeId = 0)
     {
         return ReadRangeRequestCore(BacnetReadRangeRequestTypes.RR_BY_POSITION, adr, objectId, idxBegin, DateTime.Now, ref quantity, out range, invokeId);
@@ -1497,16 +1596,18 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
     public bool SubscribeCOVRequest(BacnetAddress adr, BacnetObjectId objectId, uint subscribeId, bool cancel, bool issueConfirmedNotifications, uint lifetime, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginSubscribeCOVRequest(adr, objectId, subscribeId, cancel, issueConfirmedNotifications, lifetime, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginSubscribeCOVRequest(adr, objectId, subscribeId, cancel, issueConfirmedNotifications, lifetime, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -1517,10 +1618,12 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
@@ -1528,7 +1631,7 @@ public class BacnetClient : IDisposable
     {
         Log.Debug($"Sending SubscribeCOVRequest {objectId}");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
@@ -1544,7 +1647,7 @@ public class BacnetClient : IDisposable
 
     public void EndSubscribeCOVRequest(IAsyncResult result, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -1555,7 +1658,7 @@ public class BacnetClient : IDisposable
     // DAL
     public bool SendConfirmedEventNotificationRequest(BacnetAddress adr, BacnetEventNotificationData eventData, byte invokeId = 0, BacnetAddress source = null)
     {
-        using (var result = (BacnetAsyncResult)BeginSendConfirmedEventNotificationRequest(adr, eventData, true, invokeId, source))
+        using (var result = (BacnetAsyncResult) BeginSendConfirmedEventNotificationRequest(adr, eventData, true, invokeId, source))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -1566,10 +1669,12 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
@@ -1578,7 +1683,7 @@ public class BacnetClient : IDisposable
     {
         Log.Debug($"Sending Confirmed Event Notification {eventData.eventType} {eventData.eventObjectIdentifier}");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr, source);
@@ -1595,7 +1700,7 @@ public class BacnetClient : IDisposable
     // DAL
     public void EndSendConfirmedEventNotificationRequest(IAsyncResult result, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -1605,7 +1710,7 @@ public class BacnetClient : IDisposable
 
     public bool SubscribePropertyRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyReference monitoredProperty, uint subscribeId, bool cancel, bool issueConfirmedNotifications, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginSubscribePropertyRequest(adr, objectId, monitoredProperty, subscribeId, cancel, issueConfirmedNotifications, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginSubscribePropertyRequest(adr, objectId, monitoredProperty, subscribeId, cancel, issueConfirmedNotifications, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -1616,10 +1721,12 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
@@ -1627,7 +1734,7 @@ public class BacnetClient : IDisposable
     {
         Log.Debug($"Sending SubscribePropertyRequest {objectId}.{monitoredProperty}");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
@@ -1643,7 +1750,7 @@ public class BacnetClient : IDisposable
 
     public void EndSubscribePropertyRequest(IAsyncResult result, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -1653,7 +1760,7 @@ public class BacnetClient : IDisposable
 
     public bool ReadPropertyRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyIds propertyId, out IList<BacnetValue> valueList, byte invokeId = 0, uint arrayIndex = ASN1.BACNET_ARRAY_ALL)
     {
-        using (var result = (BacnetAsyncResult)BeginReadPropertyRequest(adr, objectId, propertyId, true, invokeId, arrayIndex))
+        using (var result = (BacnetAsyncResult) BeginReadPropertyRequest(adr, objectId, propertyId, true, invokeId, arrayIndex))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -1664,10 +1771,12 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         valueList = null;
         return false;
     }
@@ -1682,25 +1791,26 @@ public class BacnetClient : IDisposable
     public Task<IList<BacnetValue>> ReadPropertyAsync(BacnetAddress address, BacnetObjectId objectId,
         BacnetPropertyIds propertyId, byte invokeId = 0, uint arrayIndex = ASN1.BACNET_ARRAY_ALL)
     {
-        return Task<IList<BacnetValue>>.Factory.StartNew(() =>
-        {
-            if (!ReadPropertyRequest(address, objectId, propertyId, out IList<BacnetValue> result, invokeId, arrayIndex))
-                throw new Exception($"Failed to read property {propertyId} of {objectId} from {address}");
+        return Task<IList<BacnetValue>>.Factory.StartNew(
+            () =>
+            {
+                if (!ReadPropertyRequest(address, objectId, propertyId, out IList<BacnetValue> result, invokeId, arrayIndex))
+                    throw new Exception($"Failed to read property {propertyId} of {objectId} from {address}");
 
-            return result;
-        });
+                return result;
+            });
     }
 
     public IAsyncResult BeginReadPropertyRequest(BacnetAddress address, BacnetObjectId objectId, BacnetPropertyIds propertyId, bool waitForTransmit, byte invokeId = 0, uint arrayIndex = ASN1.BACNET_ARRAY_ALL)
     {
         Log.Debug($"Sending ReadPropertyRequest {objectId} {propertyId}");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, address.RoutedSource, address.RoutedDestination);
         APDU.EncodeConfirmedServiceRequest(buffer, PduConfirmedServiceRequest(), BacnetConfirmedServices.SERVICE_CONFIRMED_READ_PROPERTY, MaxSegments, Transport.MaxAdpuLength, invokeId);
-        Services.EncodeReadProperty(buffer, objectId, (uint)propertyId, arrayIndex);
+        Services.EncodeReadProperty(buffer, objectId, (uint) propertyId, arrayIndex);
 
         //send
         var ret = new BacnetAsyncResult(this, address, invokeId, buffer.buffer, buffer.offset - Transport.HeaderLength, waitForTransmit, TransmitTimeout);
@@ -1711,7 +1821,7 @@ public class BacnetClient : IDisposable
 
     public void EndReadPropertyRequest(IAsyncResult result, out IList<BacnetValue> valueList, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -1732,7 +1842,7 @@ public class BacnetClient : IDisposable
 
     public bool WritePropertyRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyIds propertyId, IEnumerable<BacnetValue> valueList, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginWritePropertyRequest(adr, objectId, propertyId, valueList, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginWritePropertyRequest(adr, objectId, propertyId, valueList, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -1743,16 +1853,18 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
     public bool WritePropertyMultipleRequest(BacnetAddress adr, BacnetObjectId objectId, ICollection<BacnetPropertyValue> valueList, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginWritePropertyMultipleRequest(adr, objectId, valueList, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginWritePropertyMultipleRequest(adr, objectId, valueList, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -1763,10 +1875,12 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
@@ -1774,12 +1888,12 @@ public class BacnetClient : IDisposable
     {
         Log.Debug($"Sending WritePropertyRequest {objectId} {propertyId}");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
         APDU.EncodeConfirmedServiceRequest(buffer, BacnetPduTypes.PDU_TYPE_CONFIRMED_SERVICE_REQUEST, BacnetConfirmedServices.SERVICE_CONFIRMED_WRITE_PROPERTY, MaxSegments, Transport.MaxAdpuLength, invokeId);
-        Services.EncodeWriteProperty(buffer, objectId, (uint)propertyId, ASN1.BACNET_ARRAY_ALL, _writepriority, valueList);
+        Services.EncodeWriteProperty(buffer, objectId, (uint) propertyId, ASN1.BACNET_ARRAY_ALL, _writepriority, valueList);
 
         //send
         var ret = new BacnetAsyncResult(this, adr, invokeId, buffer.buffer, buffer.offset - Transport.HeaderLength, waitForTransmit, TransmitTimeout);
@@ -1791,7 +1905,7 @@ public class BacnetClient : IDisposable
     public IAsyncResult BeginWritePropertyMultipleRequest(BacnetAddress adr, BacnetObjectId objectId, ICollection<BacnetPropertyValue> valueList, bool waitForTransmit, byte invokeId = 0)
     {
         Log.Debug($"Sending WritePropertyMultipleRequest {objectId}");
-        if (invokeId == 0) invokeId = (byte)Interlocked.Increment(ref _invokeId);
+        if (invokeId == 0) invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         //BacnetNpduControls.PriorityNormalMessage 
@@ -1809,7 +1923,7 @@ public class BacnetClient : IDisposable
 
     public void EndWritePropertyRequest(IAsyncResult result, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -1820,7 +1934,7 @@ public class BacnetClient : IDisposable
     // By Chritopher Günter : Write multiple properties on multiple objects
     public bool WritePropertyMultipleRequest(BacnetAddress adr, ICollection<BacnetReadAccessResult> valueList, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginWritePropertyMultipleRequest(adr, valueList, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginWritePropertyMultipleRequest(adr, valueList, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -1831,10 +1945,12 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
@@ -1844,7 +1960,7 @@ public class BacnetClient : IDisposable
         Log.Debug($"Sending WritePropertyMultipleRequest {objectIds}");
 
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         //BacnetNpduControls.PriorityNormalMessage 
@@ -1862,7 +1978,7 @@ public class BacnetClient : IDisposable
 
     public bool ReadPropertyMultipleRequest(BacnetAddress address, BacnetObjectId objectId, IList<BacnetPropertyReference> propertyIdAndArrayIndex, out IList<BacnetReadAccessResult> values, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginReadPropertyMultipleRequest(address, objectId, propertyIdAndArrayIndex, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginReadPropertyMultipleRequest(address, objectId, propertyIdAndArrayIndex, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -1873,10 +1989,12 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         values = null;
         return false;
     }
@@ -1891,24 +2009,26 @@ public class BacnetClient : IDisposable
     public Task<IList<BacnetPropertyValue>> ReadPropertyMultipleAsync(BacnetAddress address,
         BacnetObjectId objectId, params BacnetPropertyIds[] propertyIds)
     {
-        var propertyReferences = propertyIds.Select(p =>
-            new BacnetPropertyReference((uint)p, ASN1.BACNET_ARRAY_ALL));
+        var propertyReferences = propertyIds.Select(
+            p =>
+                new BacnetPropertyReference((uint) p, ASN1.BACNET_ARRAY_ALL));
 
-        return Task<IList<BacnetPropertyValue>>.Factory.StartNew(() =>
-        {
-            if (!ReadPropertyMultipleRequest(address, objectId, propertyReferences.ToList(), out var result))
-                throw new Exception($"Failed to read multiple properties of {objectId} from {address}");
+        return Task<IList<BacnetPropertyValue>>.Factory.StartNew(
+            () =>
+            {
+                if (!ReadPropertyMultipleRequest(address, objectId, propertyReferences.ToList(), out var result))
+                    throw new Exception($"Failed to read multiple properties of {objectId} from {address}");
 
-            return result.Single().values;
-        });
+                return result.Single().values;
+            });
     }
 
     public IAsyncResult BeginReadPropertyMultipleRequest(BacnetAddress adr, BacnetObjectId objectId, IList<BacnetPropertyReference> propertyIdAndArrayIndex, bool waitForTransmit, byte invokeId = 0)
     {
-        var propertyIds = string.Join(", ", propertyIdAndArrayIndex.Select(v => (BacnetPropertyIds)v.propertyIdentifier));
+        var propertyIds = string.Join(", ", propertyIdAndArrayIndex.Select(v => (BacnetPropertyIds) v.propertyIdentifier));
         Log.Debug($"Sending ReadPropertyMultipleRequest {objectId} {propertyIds}");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
@@ -1925,7 +2045,7 @@ public class BacnetClient : IDisposable
     // Another way to read multiple properties on multiples objects, if supported by devices
     public bool ReadPropertyMultipleRequest(BacnetAddress address, IList<BacnetReadAccessSpecification> properties, out IList<BacnetReadAccessResult> values, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginReadPropertyMultipleRequest(address, properties, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginReadPropertyMultipleRequest(address, properties, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -1936,10 +2056,12 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         values = null;
         return false;
     }
@@ -1949,7 +2071,7 @@ public class BacnetClient : IDisposable
         var objectIds = string.Join(", ", properties.Select(v => v.objectIdentifier));
         Log.Debug($"Sending ReadPropertyMultipleRequest {objectIds}");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
@@ -1965,7 +2087,7 @@ public class BacnetClient : IDisposable
 
     public void EndReadPropertyMultipleRequest(IAsyncResult result, out IList<BacnetReadAccessResult> values, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -1994,7 +2116,7 @@ public class BacnetClient : IDisposable
     // By Christopher Günter
     public bool CreateObjectRequest(BacnetAddress adr, BacnetObjectId objectId, ICollection<BacnetPropertyValue> valueList = null, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginCreateObjectRequest(adr, objectId, valueList, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginCreateObjectRequest(adr, objectId, valueList, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -2005,17 +2127,19 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
     public IAsyncResult BeginCreateObjectRequest(BacnetAddress adr, BacnetObjectId objectId, ICollection<BacnetPropertyValue> valueList, bool waitForTransmit, byte invokeId = 0)
     {
         Log.Debug("Sending CreateObjectRequest");
-        if (invokeId == 0) invokeId = (byte)Interlocked.Increment(ref _invokeId);
+        if (invokeId == 0) invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
 
@@ -2032,7 +2156,7 @@ public class BacnetClient : IDisposable
 
     public void EndCreateObjectRequest(IAsyncResult result, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -2042,7 +2166,7 @@ public class BacnetClient : IDisposable
 
     public bool DeleteObjectRequest(BacnetAddress adr, BacnetObjectId objectId, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginDeleteObjectRequest(adr, objectId, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginDeleteObjectRequest(adr, objectId, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -2053,6 +2177,7 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
@@ -2064,7 +2189,7 @@ public class BacnetClient : IDisposable
     public IAsyncResult BeginDeleteObjectRequest(BacnetAddress adr, BacnetObjectId objectId, bool waitForTransmit, byte invokeId = 0)
     {
         Log.Debug("Sending DeleteObjectRequest");
-        if (invokeId == 0) invokeId = (byte)Interlocked.Increment(ref _invokeId);
+        if (invokeId == 0) invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
 
@@ -2083,7 +2208,7 @@ public class BacnetClient : IDisposable
 
     public void EndDeleteObjectRequest(IAsyncResult result, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -2093,11 +2218,10 @@ public class BacnetClient : IDisposable
 
     public bool AddListElementRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyReference reference, IList<BacnetValue> valueList, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginAddListElementRequest(adr, objectId, reference, valueList, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginAddListElementRequest(adr, objectId, reference, valueList, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
-
                 if (result.WaitForDone(Timeout))
                 {
                     EndAddListElementRequest(result, out var ex);
@@ -2105,17 +2229,19 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         //values = null;
         return false;
     }
 
     public bool RemoveListElementRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyReference reference, IList<BacnetValue> valueList, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginRemoveListElementRequest(adr, objectId, reference, valueList, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginRemoveListElementRequest(adr, objectId, reference, valueList, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -2126,10 +2252,12 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         //values = null;
         return false;
     }
@@ -2138,7 +2266,7 @@ public class BacnetClient : IDisposable
     {
         Log.Debug("Sending RemoveListElementRequest");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
@@ -2154,9 +2282,9 @@ public class BacnetClient : IDisposable
 
     public IAsyncResult BeginAddListElementRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyReference reference, IList<BacnetValue> valueList, bool waitForTransmit, byte invokeId = 0)
     {
-        Log.Debug($"Sending AddListElementRequest {objectId} {(BacnetPropertyIds)reference.propertyIdentifier}");
+        Log.Debug($"Sending AddListElementRequest {objectId} {(BacnetPropertyIds) reference.propertyIdentifier}");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
@@ -2172,7 +2300,7 @@ public class BacnetClient : IDisposable
 
     public void EndAddListElementRequest(IAsyncResult result, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -2186,7 +2314,7 @@ public class BacnetClient : IDisposable
     // return buffer start also with the Tag 3
     public bool RawEncodedDecodedPropertyConfirmedRequest(BacnetAddress adr, BacnetObjectId objectId, BacnetPropertyIds propertyId, BacnetConfirmedServices serviceId, ref byte[] inOutBuffer, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginRawEncodedDecodedPropertyConfirmedRequest(adr, objectId, propertyId, serviceId, inOutBuffer, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginRawEncodedDecodedPropertyConfirmedRequest(adr, objectId, propertyId, serviceId, inOutBuffer, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -2197,10 +2325,12 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         inOutBuffer = null;
         return false;
     }
@@ -2210,14 +2340,14 @@ public class BacnetClient : IDisposable
     {
         Log.Debug("Sending RawEncodedRequest");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
         APDU.EncodeConfirmedServiceRequest(buffer, PduConfirmedServiceRequest(), serviceId, MaxSegments, Transport.MaxAdpuLength, invokeId);
 
         ASN1.encode_context_object_id(buffer, 0, objectId.type, objectId.instance);
-        ASN1.encode_context_enumerated(buffer, 1, (byte)propertyId);
+        ASN1.encode_context_enumerated(buffer, 1, (byte) propertyId);
 
         // No content encoding to do
         if (inOutBuffer != null)
@@ -2233,7 +2363,7 @@ public class BacnetClient : IDisposable
     // Fc
     public void EndRawEncodedDecodedPropertyConfirmedRequest(IAsyncResult result, BacnetConfirmedServices serviceId, out byte[] inOutBuffer, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -2272,7 +2402,7 @@ public class BacnetClient : IDisposable
 
     public bool DeviceCommunicationControlRequest(BacnetAddress adr, uint timeDuration, uint enableDisable, string password, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginDeviceCommunicationControlRequest(adr, timeDuration, enableDisable, password, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginDeviceCommunicationControlRequest(adr, timeDuration, enableDisable, password, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -2281,10 +2411,12 @@ public class BacnetClient : IDisposable
                     EndDeviceCommunicationControlRequest(result, out var ex);
                     return ex == null;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
@@ -2292,7 +2424,7 @@ public class BacnetClient : IDisposable
     {
         Log.Debug("Sending DeviceCommunicationControlRequest");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
@@ -2308,7 +2440,7 @@ public class BacnetClient : IDisposable
 
     public void EndDeviceCommunicationControlRequest(IAsyncResult result, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -2319,7 +2451,7 @@ public class BacnetClient : IDisposable
     // FChaxel
     public bool GetAlarmSummaryOrEventRequest(BacnetAddress adr, bool getEvent, ref IList<BacnetGetEventInformationData> alarms, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginGetAlarmSummaryOrEventRequest(adr, getEvent, alarms, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginGetAlarmSummaryOrEventRequest(adr, getEvent, alarms, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -2335,6 +2467,7 @@ public class BacnetClient : IDisposable
                     result.Resend();
             }
         }
+
         return false;
     }
 
@@ -2342,20 +2475,21 @@ public class BacnetClient : IDisposable
     {
         IList<BacnetGetEventInformationData> result = new List<BacnetGetEventInformationData>();
 
-        return Task<IList<BacnetGetEventInformationData>>.Factory.StartNew(() =>
-        {
-            if (!GetAlarmSummaryOrEventRequest(address, true, ref result, invokeId))
-                throw new Exception($"Failed to get events from {address}");
+        return Task<IList<BacnetGetEventInformationData>>.Factory.StartNew(
+            () =>
+            {
+                if (!GetAlarmSummaryOrEventRequest(address, true, ref result, invokeId))
+                    throw new Exception($"Failed to get events from {address}");
 
-            return result;
-        });
+                return result;
+            });
     }
 
     public IAsyncResult BeginGetAlarmSummaryOrEventRequest(BacnetAddress adr, bool getEvent, IList<BacnetGetEventInformationData> alarms, bool waitForTransmit, byte invokeId = 0)
     {
         Log.Debug("Sending Alarm summary request");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
@@ -2380,7 +2514,7 @@ public class BacnetClient : IDisposable
     public void EndGetAlarmSummaryOrEventRequest(IAsyncResult result, bool getEvent, ref IList<BacnetGetEventInformationData> alarms, out bool moreEvent, out Exception ex)
     {
         moreEvent = false;
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -2397,6 +2531,7 @@ public class BacnetClient : IDisposable
 
         res.Dispose();
     }
+
     // DAL
     public void GetAlarmSummaryOrEventInformationResponse(BacnetAddress adr, bool getEvent, byte invoke_id, Segmentation segmentation, BacnetGetEventInformationData[] data, bool more_events)
     {
@@ -2405,19 +2540,13 @@ public class BacnetClient : IDisposable
         // but if you don't want it segmented (which would be normal usage)
         // you have to compute the message data and the 'more' flag
         // outside this function.
-        HandleSegmentationResponse(adr, invoke_id, segmentation, (o) =>
-        {
-            SendComplexAck(adr, invoke_id, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_GET_EVENT_INFORMATION, (b) =>
-            {
-                Services.EncodeGetEventInformationAcknowledge(b, data, more_events);
-            });
-        });
+        HandleSegmentationResponse(adr, invoke_id, segmentation, (o) => { SendComplexAck(adr, invoke_id, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_GET_EVENT_INFORMATION, (b) => { Services.EncodeGetEventInformationAcknowledge(b, data, more_events); }); });
     }
 
     // FChaxel
     public bool AlarmAcknowledgement(BacnetAddress adr, BacnetObjectId objId, BacnetEventStates eventState, string ackText, BacnetGenericTime evTimeStamp, BacnetGenericTime ackTimeStamp, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginAlarmAcknowledgement(adr, objId, eventState, ackText, evTimeStamp, ackTimeStamp, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginAlarmAcknowledgement(adr, objId, eventState, ackText, evTimeStamp, ackTimeStamp, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -2426,10 +2555,12 @@ public class BacnetClient : IDisposable
                     EndAlarmAcknowledgement(result, out var ex);
                     return ex == null;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
@@ -2437,12 +2568,12 @@ public class BacnetClient : IDisposable
     {
         Log.Debug("Sending AlarmAcknowledgement");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage, adr.RoutedSource, adr.RoutedDestination);
         APDU.EncodeConfirmedServiceRequest(buffer, BacnetPduTypes.PDU_TYPE_CONFIRMED_SERVICE_REQUEST, BacnetConfirmedServices.SERVICE_CONFIRMED_ACKNOWLEDGE_ALARM, MaxSegments, Transport.MaxAdpuLength, invokeId);
-        Services.EncodeAlarmAcknowledge(buffer, 57, objId, (uint)eventState, ackText, evTimeStamp, ackTimeStamp);
+        Services.EncodeAlarmAcknowledge(buffer, 57, objId, (uint) eventState, ackText, evTimeStamp, ackTimeStamp);
 
         //send
         var ret = new BacnetAsyncResult(this, adr, invokeId, buffer.buffer, buffer.offset - Transport.HeaderLength, waitForTransmit, TransmitTimeout);
@@ -2453,7 +2584,7 @@ public class BacnetClient : IDisposable
 
     public void EndAlarmAcknowledgement(IAsyncResult result, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (!res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -2461,7 +2592,7 @@ public class BacnetClient : IDisposable
 
     public bool ReinitializeRequest(BacnetAddress adr, BacnetReinitializedStates state, string password, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginReinitializeRequest(adr, state, password, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginReinitializeRequest(adr, state, password, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -2470,10 +2601,12 @@ public class BacnetClient : IDisposable
                     EndReinitializeRequest(result, out var ex);
                     return ex == null;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
@@ -2481,7 +2614,7 @@ public class BacnetClient : IDisposable
     {
         Log.Debug("Sending ReinitializeRequest");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
@@ -2497,7 +2630,7 @@ public class BacnetClient : IDisposable
 
     public void EndReinitializeRequest(IAsyncResult result, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -2508,7 +2641,7 @@ public class BacnetClient : IDisposable
     public IAsyncResult BeginConfirmedNotify(BacnetAddress adr, uint subscriberProcessIdentifier, uint initiatingDeviceIdentifier, BacnetObjectId monitoredObjectIdentifier, uint timeRemaining, IList<BacnetPropertyValue> values, bool waitForTransmit, byte invokeId = 0)
     {
         Log.Debug("Sending Notify (confirmed)");
-        if (invokeId == 0) invokeId = (byte)Interlocked.Increment(ref _invokeId);
+        if (invokeId == 0) invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, adr.RoutedSource, adr.RoutedDestination);
@@ -2524,7 +2657,7 @@ public class BacnetClient : IDisposable
 
     public void EndConfirmedNotify(IAsyncResult result, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (!res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -2545,7 +2678,7 @@ public class BacnetClient : IDisposable
             return sendbytes == buffer.offset;
         }
 
-        using (var result = (BacnetAsyncResult)BeginConfirmedNotify(adr, subscriberProcessIdentifier, initiatingDeviceIdentifier, monitoredObjectIdentifier, timeRemaining, values, true))
+        using (var result = (BacnetAsyncResult) BeginConfirmedNotify(adr, subscriberProcessIdentifier, initiatingDeviceIdentifier, monitoredObjectIdentifier, timeRemaining, values, true))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -2556,6 +2689,7 @@ public class BacnetClient : IDisposable
                         throw ex;
                     return true;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
@@ -2566,7 +2700,7 @@ public class BacnetClient : IDisposable
 
     public bool LifeSafetyOperationRequest(BacnetAddress address, BacnetObjectId objectId, string requestingSrc, BacnetLifeSafetyOperations operation, byte invokeId = 0)
     {
-        using (var result = (BacnetAsyncResult)BeginLifeSafetyOperationRequest(address, objectId, 0, requestingSrc, operation, true, invokeId))
+        using (var result = (BacnetAsyncResult) BeginLifeSafetyOperationRequest(address, objectId, 0, requestingSrc, operation, true, invokeId))
         {
             for (var r = 0; r < _retries; r++)
             {
@@ -2575,10 +2709,12 @@ public class BacnetClient : IDisposable
                     EndLifeSafetyOperationRequest(result, out var ex);
                     return ex == null;
                 }
+
                 if (r < Retries - 1)
                     result.Resend();
             }
         }
+
         return false;
     }
 
@@ -2586,12 +2722,12 @@ public class BacnetClient : IDisposable
     {
         Log.Debug($"Sending {ToTitleCase(operation)} {objectId}");
         if (invokeId == 0)
-            invokeId = (byte)Interlocked.Increment(ref _invokeId);
+            invokeId = (byte) Interlocked.Increment(ref _invokeId);
 
         var buffer = GetEncodeBuffer(Transport.HeaderLength);
         NPDU.Encode(buffer, BacnetNpduControls.PriorityNormalMessage | BacnetNpduControls.ExpectingReply, address.RoutedSource, address.RoutedDestination);
         APDU.EncodeConfirmedServiceRequest(buffer, BacnetPduTypes.PDU_TYPE_CONFIRMED_SERVICE_REQUEST, BacnetConfirmedServices.SERVICE_CONFIRMED_LIFE_SAFETY_OPERATION, MaxSegments, Transport.MaxAdpuLength, invokeId);
-        Services.EncodeLifeSafetyOperation(buffer, processId, requestingSrc, (uint)operation, objectId);
+        Services.EncodeLifeSafetyOperation(buffer, processId, requestingSrc, (uint) operation, objectId);
 
         //send
         var ret = new BacnetAsyncResult(this, address, invokeId, buffer.buffer, buffer.offset - Transport.HeaderLength, waitForTransmit, TransmitTimeout);
@@ -2602,7 +2738,7 @@ public class BacnetClient : IDisposable
 
     public void EndLifeSafetyOperationRequest(IAsyncResult result, out Exception ex)
     {
-        var res = (BacnetAsyncResult)result;
+        var res = (BacnetAsyncResult) result;
         ex = res.Error;
         if (ex == null && !res.WaitForDone(Timeout))
             ex = new Exception("Wait Timeout");
@@ -2679,6 +2815,7 @@ public class BacnetClient : IDisposable
             buffer = segmentation.buffer;
             isSegmented = segmentation.sequence_number > 0 | moreFollows;
         }
+
         buffer.Reset(Transport.HeaderLength);
 
         //encode
@@ -2726,57 +2863,58 @@ public class BacnetClient : IDisposable
             return;
 
         // start new thread to handle the segment sequence (if required)
-        ThreadPool.QueueUserWorkItem(o =>
-        {
-            var oldMaxInfoFrames = Transport.MaxInfoFrames;
-            Transport.MaxInfoFrames = segmentation.window_size; // increase max_info_frames, to increase throughput. This might be against 'standard'
+        ThreadPool.QueueUserWorkItem(
+            o =>
+            {
+                var oldMaxInfoFrames = Transport.MaxInfoFrames;
+                Transport.MaxInfoFrames = segmentation.window_size; // increase max_info_frames, to increase throughput. This might be against 'standard'
 
                 while (true)
-            {
-                var moreFollows = (segmentation.buffer.result & EncodeResult.NotEnoughBuffer) > 0;
+                {
+                    var moreFollows = (segmentation.buffer.result & EncodeResult.NotEnoughBuffer) > 0;
 
                     // wait for segmentACK
                     if ((segmentation.sequence_number - 1) % segmentation.window_size == 0 || !moreFollows)
-                {
-                    if (!WaitForAllTransmits(TransmitTimeout))
                     {
-                        Log.Warn("Transmit timeout");
-                        break;
-                    }
+                        if (!WaitForAllTransmits(TransmitTimeout))
+                        {
+                            Log.Warn("Transmit timeout");
+                            break;
+                        }
 
-                    var currentNumber = segmentation.sequence_number;
-
-                    if (!WaitForSegmentAck(adr, invokeId, segmentation, Timeout))
-                    {
-                        Log.Warn("Didn't get segmentACK");
-                        break;
-                    }
-
-                    if (segmentation.sequence_number != currentNumber)
-                    {
-                        Log.Debug("Oh, a retransmit");
-                        moreFollows = true;
-                    }
-                }
-                else
-                {
-                        // a negative segmentACK perhaps
                         var currentNumber = segmentation.sequence_number;
-                    WaitForSegmentAck(adr, invokeId, segmentation, 0); // don't wait
+
+                        if (!WaitForSegmentAck(adr, invokeId, segmentation, Timeout))
+                        {
+                            Log.Warn("Didn't get segmentACK");
+                            break;
+                        }
 
                         if (segmentation.sequence_number != currentNumber)
-                        Log.Debug("Oh, a retransmit");
-                }
+                        {
+                            Log.Debug("Oh, a retransmit");
+                            moreFollows = true;
+                        }
+                    }
+                    else
+                    {
+                        // a negative segmentACK perhaps
+                        var currentNumber = segmentation.sequence_number;
+                        WaitForSegmentAck(adr, invokeId, segmentation, 0); // don't wait
 
-                if (moreFollows)
+                        if (segmentation.sequence_number != currentNumber)
+                            Log.Debug("Oh, a retransmit");
+                    }
+
+                    if (moreFollows)
                         // lock (m_lockObject) transmit(segmentation);
                         transmit(segmentation);
-                else
-                    break;
-            }
+                    else
+                        break;
+                }
 
-            Transport.MaxInfoFrames = oldMaxInfoFrames;
-        });
+                Transport.MaxInfoFrames = oldMaxInfoFrames;
+            });
     }
 
     private void SendComplexAck(BacnetAddress adr, byte invokeId, Segmentation segmentation, BacnetConfirmedServices service, Action<EncodeBuffer> apduContentEncode)
@@ -2793,27 +2931,33 @@ public class BacnetClient : IDisposable
                 // DAL
                 SendAbort(adr, invokeId, BacnetAbortReason.SEGMENTATION_NOT_SUPPORTED);
                 //ErrorResponse(adr, service, invokeId, BacnetErrorClasses.ERROR_CLASS_SERVICES, BacnetErrorCodes.ERROR_CODE_ABORT_APDU_TOO_LONG);
-                buffer.result = EncodeResult.Good;     //don't continue the segmentation
+                buffer.result = EncodeResult.Good; //don't continue the segmentation
                 return;
             }
 
             //first segment? validate max segments
-            if (segmentation.sequence_number == 0)  //only validate first segment
+            if (segmentation.sequence_number == 0) //only validate first segment
             {
-                if (segmentation.max_segments != 0xFF && segmentation.buffer.offset > segmentation.max_segments * (GetMaxApdu() - 5))      //5 is adpu header
+                if (segmentation.max_segments != 0xFF && segmentation.buffer.offset > segmentation.max_segments * (GetMaxApdu() - 5)) //5 is adpu header
                 {
                     Log.Info("Too much segmenation");
                     // DAL
                     SendAbort(adr, invokeId, BacnetAbortReason.APDU_TOO_LONG);
                     //ErrorResponse(adr, service, invokeId, BacnetErrorClasses.ERROR_CLASS_SERVICES, BacnetErrorCodes.ERROR_CODE_ABORT_APDU_TOO_LONG);
-                    buffer.result = EncodeResult.Good;     //don't continue the segmentation
+                    buffer.result = EncodeResult.Good; //don't continue the segmentation
                     return;
                 }
+
                 Log.Debug("Segmentation required");
             }
 
             //increment before ack can do so (race condition)
-            unchecked { segmentation.sequence_number++; };
+            unchecked
+            {
+                segmentation.sequence_number++;
+            }
+
+            ;
         }
 
         //send
@@ -2822,62 +2966,32 @@ public class BacnetClient : IDisposable
 
     public void ReadPropertyResponse(BacnetAddress adr, byte invokeId, Segmentation segmentation, BacnetObjectId objectId, BacnetPropertyReference property, IEnumerable<BacnetValue> value)
     {
-        HandleSegmentationResponse(adr, invokeId, segmentation, o =>
-        {
-            SendComplexAck(adr, invokeId, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_READ_PROPERTY, b =>
-            {
-                Services.EncodeReadPropertyAcknowledge(b, objectId, property.propertyIdentifier, property.propertyArrayIndex, value);
-            });
-        });
+        HandleSegmentationResponse(adr, invokeId, segmentation, o => { SendComplexAck(adr, invokeId, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_READ_PROPERTY, b => { Services.EncodeReadPropertyAcknowledge(b, objectId, property.propertyIdentifier, property.propertyArrayIndex, value); }); });
     }
 
     public void CreateObjectResponse(BacnetAddress adr, byte invokeId, Segmentation segmentation, BacnetObjectId objectId)
     {
-        SendComplexAck(adr, invokeId, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_CREATE_OBJECT, b =>
-        {
-            Services.EncodeCreateObjectAcknowledge(b, objectId);
-        });
+        SendComplexAck(adr, invokeId, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_CREATE_OBJECT, b => { Services.EncodeCreateObjectAcknowledge(b, objectId); });
     }
 
     public void ReadPropertyMultipleResponse(BacnetAddress adr, byte invokeId, Segmentation segmentation, IList<BacnetReadAccessResult> values)
     {
-        HandleSegmentationResponse(adr, invokeId, segmentation, o =>
-        {
-            SendComplexAck(adr, invokeId, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_READ_PROP_MULTIPLE, b =>
-            {
-                Services.EncodeReadPropertyMultipleAcknowledge(b, values);
-            });
-        });
+        HandleSegmentationResponse(adr, invokeId, segmentation, o => { SendComplexAck(adr, invokeId, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_READ_PROP_MULTIPLE, b => { Services.EncodeReadPropertyMultipleAcknowledge(b, values); }); });
     }
 
     public void ReadRangeResponse(BacnetAddress adr, byte invokeId, Segmentation segmentation, BacnetObjectId objectId, BacnetPropertyReference property, BacnetResultFlags status, uint itemCount, byte[] applicationData, BacnetReadRangeRequestTypes requestType, uint firstSequenceNo)
     {
-        HandleSegmentationResponse(adr, invokeId, segmentation, o =>
-        {
-            SendComplexAck(adr, invokeId, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_READ_RANGE, b =>
-            {
-                Services.EncodeReadRangeAcknowledge(b, objectId, property.propertyIdentifier, property.propertyArrayIndex, BacnetBitString.ConvertFromInt((uint)status), itemCount, applicationData, requestType, firstSequenceNo);
-            });
-        });
+        HandleSegmentationResponse(adr, invokeId, segmentation, o => { SendComplexAck(adr, invokeId, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_READ_RANGE, b => { Services.EncodeReadRangeAcknowledge(b, objectId, property.propertyIdentifier, property.propertyArrayIndex, BacnetBitString.ConvertFromInt((uint) status), itemCount, applicationData, requestType, firstSequenceNo); }); });
     }
 
     public void ReadFileResponse(BacnetAddress adr, byte invokeId, Segmentation segmentation, int position, uint count, bool endOfFile, byte[] fileBuffer)
     {
-        HandleSegmentationResponse(adr, invokeId, segmentation, o =>
-        {
-            SendComplexAck(adr, invokeId, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_ATOMIC_READ_FILE, b =>
-            {
-                Services.EncodeAtomicReadFileAcknowledge(b, true, endOfFile, position, 1, new[] { fileBuffer }, new[] { (int)count });
-            });
-        });
+        HandleSegmentationResponse(adr, invokeId, segmentation, o => { SendComplexAck(adr, invokeId, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_ATOMIC_READ_FILE, b => { Services.EncodeAtomicReadFileAcknowledge(b, true, endOfFile, position, 1, new[] {fileBuffer}, new[] {(int) count}); }); });
     }
 
     public void WriteFileResponse(BacnetAddress adr, byte invokeId, Segmentation segmentation, int position)
     {
-        SendComplexAck(adr, invokeId, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_ATOMIC_WRITE_FILE, b =>
-        {
-            Services.EncodeAtomicWriteFileAcknowledge(b, true, position);
-        });
+        SendComplexAck(adr, invokeId, segmentation, BacnetConfirmedServices.SERVICE_CONFIRMED_ATOMIC_WRITE_FILE, b => { Services.EncodeAtomicWriteFileAcknowledge(b, true, position); });
     }
 
     public void ErrorResponse(BacnetAddress adr, BacnetConfirmedServices service, byte invokeId, BacnetErrorClasses errorClass, BacnetErrorCodes errorCode)
@@ -2918,7 +3032,7 @@ public class BacnetClient : IDisposable
         if (!_lastSegmentAck.Wait(adr, invokeId, timeout))
             return false;
 
-        segmentation.sequence_number = (byte)((_lastSegmentAck.SequenceNumber + 1) % 256);
+        segmentation.sequence_number = (byte) ((_lastSegmentAck.SequenceNumber + 1) % 256);
         segmentation.window_size = _lastSegmentAck.WindowSize;
         return true;
     }

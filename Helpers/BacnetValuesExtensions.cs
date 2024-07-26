@@ -49,7 +49,7 @@ public static class BacnetValuesExtensions
 
         return property.property.propertyArrayIndex == ASN1.BACNET_ARRAY_ALL
             ? property.value.GetMany<T>()
-            : new[] { property.value[(int)property.property.propertyArrayIndex].As<T>() };
+            : new[] {property.value[(int) property.property.propertyArrayIndex].As<T>()};
     }
 
     public static T[] GetMany<T>(this IList<BacnetValue> values)

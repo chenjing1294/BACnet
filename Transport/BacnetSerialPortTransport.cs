@@ -16,7 +16,7 @@ public class BacnetSerialPortTransport : IBacnetSerialTransport
     public override bool Equals(object obj)
     {
         if (obj is not BacnetSerialPortTransport) return false;
-        var a = (BacnetSerialPortTransport)obj;
+        var a = (BacnetSerialPortTransport) obj;
         return _portName.Equals(a._portName);
     }
 

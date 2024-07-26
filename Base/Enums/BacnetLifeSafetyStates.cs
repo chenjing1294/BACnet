@@ -28,6 +28,7 @@ public enum BacnetLifeSafetyStates
     LIFE_SAFETY_STATE_SUPERVISORY = 22,
     LIFE_SAFETY_STATE_TEST_SUPERVISORY = 23,
     MAX_LIFE_SAFETY_STATE = 24,
+
     /* Enumerated values 0-255 are reserved for definition by ASHRAE.  */
     /* Enumerated values 256-65535 may be used by others subject to  */
     /* procedures and constraints described in Clause 23. */

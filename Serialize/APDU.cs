@@ -4,12 +4,12 @@ public class APDU
 {
     public static BacnetPduTypes GetDecodedType(byte[] buffer, int offset)
     {
-        return (BacnetPduTypes)buffer[offset];
+        return (BacnetPduTypes) buffer[offset];
     }
 
     public static void SetDecodedType(byte[] buffer, int offset, BacnetPduTypes type)
     {
-        buffer[offset] = (byte)type;
+        buffer[offset] = (byte) type;
     }
 
     public static int GetDecodedInvokeId(byte[] buffer, int offset)
@@ -33,8 +33,8 @@ public class APDU
     public static void EncodeConfirmedServiceRequest(EncodeBuffer buffer, BacnetPduTypes type, BacnetConfirmedServices service, BacnetMaxSegments maxSegments,
         BacnetMaxAdpu maxAdpu, byte invokeId, byte sequenceNumber = 0, byte proposedWindowSize = 0)
     {
-        buffer.buffer[buffer.offset++] = (byte)type;
-        buffer.buffer[buffer.offset++] = (byte)((byte)maxSegments | (byte)maxAdpu);
+        buffer.buffer[buffer.offset++] = (byte) type;
+        buffer.buffer[buffer.offset++] = (byte) ((byte) maxSegments | (byte) maxAdpu);
         buffer.buffer[buffer.offset++] = invokeId;
 
         if ((type & BacnetPduTypes.SEGMENTED_MESSAGE) > 0)
@@ -42,7 +42,8 @@ public class APDU
             buffer.buffer[buffer.offset++] = sequenceNumber;
             buffer.buffer[buffer.offset++] = proposedWindowSize;
         }
-        buffer.buffer[buffer.offset++] = (byte)service;
+
+        buffer.buffer[buffer.offset++] = (byte) service;
     }
 
     public static int DecodeConfirmedServiceRequest(byte[] buffer, int offset, out BacnetPduTypes type, out BacnetConfirmedServices service,
@@ -50,9 +51,9 @@ public class APDU
     {
         var orgOffset = offset;
 
-        type = (BacnetPduTypes)buffer[offset++];
-        maxSegments = (BacnetMaxSegments)(buffer[offset] & 0xF0);
-        maxAdpu = (BacnetMaxAdpu)(buffer[offset++] & 0x0F);
+        type = (BacnetPduTypes) buffer[offset++];
+        maxSegments = (BacnetMaxSegments) (buffer[offset] & 0xF0);
+        maxAdpu = (BacnetMaxAdpu) (buffer[offset++] & 0x0F);
         invokeId = buffer[offset++];
 
         sequenceNumber = 0;
@@ -62,41 +63,42 @@ public class APDU
             sequenceNumber = buffer[offset++];
             proposedWindowNumber = buffer[offset++];
         }
-        service = (BacnetConfirmedServices)buffer[offset++];
+
+        service = (BacnetConfirmedServices) buffer[offset++];
 
         return offset - orgOffset;
     }
 
     public static void EncodeUnconfirmedServiceRequest(EncodeBuffer buffer, BacnetPduTypes type, BacnetUnconfirmedServices service)
     {
-        buffer.buffer[buffer.offset++] = (byte)type;
-        buffer.buffer[buffer.offset++] = (byte)service;
+        buffer.buffer[buffer.offset++] = (byte) type;
+        buffer.buffer[buffer.offset++] = (byte) service;
     }
 
     public static int DecodeUnconfirmedServiceRequest(byte[] buffer, int offset, out BacnetPduTypes type, out BacnetUnconfirmedServices service)
     {
         var orgOffset = offset;
 
-        type = (BacnetPduTypes)buffer[offset++];
-        service = (BacnetUnconfirmedServices)buffer[offset++];
+        type = (BacnetPduTypes) buffer[offset++];
+        service = (BacnetUnconfirmedServices) buffer[offset++];
 
         return offset - orgOffset;
     }
 
     public static void EncodeSimpleAck(EncodeBuffer buffer, BacnetPduTypes type, BacnetConfirmedServices service, byte invokeId)
     {
-        buffer.buffer[buffer.offset++] = (byte)type;
+        buffer.buffer[buffer.offset++] = (byte) type;
         buffer.buffer[buffer.offset++] = invokeId;
-        buffer.buffer[buffer.offset++] = (byte)service;
+        buffer.buffer[buffer.offset++] = (byte) service;
     }
 
     public static int DecodeSimpleAck(byte[] buffer, int offset, out BacnetPduTypes type, out BacnetConfirmedServices service, out byte invokeId)
     {
         var orgOffset = offset;
 
-        type = (BacnetPduTypes)buffer[offset++];
+        type = (BacnetPduTypes) buffer[offset++];
         invokeId = buffer[offset++];
-        service = (BacnetConfirmedServices)buffer[offset++];
+        service = (BacnetConfirmedServices) buffer[offset++];
 
         return offset - orgOffset;
     }
@@ -104,7 +106,7 @@ public class APDU
     public static int EncodeComplexAck(EncodeBuffer buffer, BacnetPduTypes type, BacnetConfirmedServices service, byte invokeId, byte sequenceNumber = 0, byte proposedWindowNumber = 0)
     {
         var len = 3;
-        buffer.buffer[buffer.offset++] = (byte)type;
+        buffer.buffer[buffer.offset++] = (byte) type;
         buffer.buffer[buffer.offset++] = invokeId;
         if ((type & BacnetPduTypes.SEGMENTED_MESSAGE) > 0)
         {
@@ -112,7 +114,8 @@ public class APDU
             buffer.buffer[buffer.offset++] = proposedWindowNumber;
             len += 2;
         }
-        buffer.buffer[buffer.offset++] = (byte)service;
+
+        buffer.buffer[buffer.offset++] = (byte) service;
         return len;
     }
 
@@ -121,7 +124,7 @@ public class APDU
     {
         var orgOffset = offset;
 
-        type = (BacnetPduTypes)buffer[offset++];
+        type = (BacnetPduTypes) buffer[offset++];
         invokeId = buffer[offset++];
 
         sequenceNumber = 0;
@@ -131,14 +134,15 @@ public class APDU
             sequenceNumber = buffer[offset++];
             proposedWindowNumber = buffer[offset++];
         }
-        service = (BacnetConfirmedServices)buffer[offset++];
+
+        service = (BacnetConfirmedServices) buffer[offset++];
 
         return offset - orgOffset;
     }
 
     public static void EncodeSegmentAck(EncodeBuffer buffer, BacnetPduTypes type, byte originalInvokeId, byte sequenceNumber, byte actualWindowSize)
     {
-        buffer.buffer[buffer.offset++] = (byte)type;
+        buffer.buffer[buffer.offset++] = (byte) type;
         buffer.buffer[buffer.offset++] = originalInvokeId;
         buffer.buffer[buffer.offset++] = sequenceNumber;
         buffer.buffer[buffer.offset++] = actualWindowSize;
@@ -148,7 +152,7 @@ public class APDU
     {
         var orgOffset = offset;
 
-        type = (BacnetPduTypes)buffer[offset++];
+        type = (BacnetPduTypes) buffer[offset++];
         originalInvokeId = buffer[offset++];
         sequenceNumber = buffer[offset++];
         actualWindowSize = buffer[offset++];
@@ -158,18 +162,18 @@ public class APDU
 
     public static void EncodeError(EncodeBuffer buffer, BacnetPduTypes type, BacnetConfirmedServices service, byte invokeId)
     {
-        buffer.buffer[buffer.offset++] = (byte)type;
+        buffer.buffer[buffer.offset++] = (byte) type;
         buffer.buffer[buffer.offset++] = invokeId;
-        buffer.buffer[buffer.offset++] = (byte)service;
+        buffer.buffer[buffer.offset++] = (byte) service;
     }
 
     public static int DecodeError(byte[] buffer, int offset, out BacnetPduTypes type, out BacnetConfirmedServices service, out byte invokeId)
     {
         var orgOffset = offset;
 
-        type = (BacnetPduTypes)buffer[offset++];
+        type = (BacnetPduTypes) buffer[offset++];
         invokeId = buffer[offset++];
-        service = (BacnetConfirmedServices)buffer[offset++];
+        service = (BacnetConfirmedServices) buffer[offset++];
 
         return offset - orgOffset;
     }
@@ -186,9 +190,9 @@ public class APDU
 
     private static void EncodeAbortOrReject(EncodeBuffer buffer, BacnetPduTypes type, byte invokeId, dynamic reason)
     {
-        buffer.buffer[buffer.offset++] = (byte)type;
+        buffer.buffer[buffer.offset++] = (byte) type;
         buffer.buffer[buffer.offset++] = invokeId;
-        buffer.buffer[buffer.offset++] = (byte)reason;
+        buffer.buffer[buffer.offset++] = (byte) reason;
     }
 
     public static int DecodeAbort(byte[] buffer, int offset, out BacnetPduTypes type,
@@ -208,9 +212,9 @@ public class APDU
     {
         var orgOffset = offset;
 
-        type = (BacnetPduTypes)buffer[offset++];
+        type = (BacnetPduTypes) buffer[offset++];
         invokeId = buffer[offset++];
-        reason = (TReason)(dynamic)buffer[offset++];
+        reason = (TReason) (dynamic) buffer[offset++];
 
         return offset - orgOffset;
     }

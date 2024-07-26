@@ -97,7 +97,7 @@ public enum BacnetPropertyIds
     PROP_PROGRAM_STATE = 92,
     PROP_PROPORTIONAL_CONSTANT = 93,
     PROP_PROPORTIONAL_CONSTANT_UNITS = 94,
-    PROP_PROTOCOL_CONFORMANCE_CLASS = 95,       /* deleted in version 1 revision 2 */
+    PROP_PROTOCOL_CONFORMANCE_CLASS = 95, /* deleted in version 1 revision 2 */
     PROP_PROTOCOL_OBJECT_TYPES_SUPPORTED = 96,
     PROP_PROTOCOL_SERVICES_SUPPORTED = 97,
     PROP_PROTOCOL_VERSION = 98,
@@ -135,6 +135,7 @@ public enum BacnetPropertyIds
     PROP_EVENT_TIME_STAMPS = 130,
     PROP_LOG_BUFFER = 131,
     PROP_LOG_DEVICE_OBJECT_PROPERTY = 132,
+
     /* The enable property is renamed from log-enable in
        Addendum b to ANSI/ASHRAE 135-2004(135b-2) */
     PROP_ENABLE = 133,
@@ -197,29 +198,35 @@ public enum BacnetPropertyIds
     PROP_VALUE_BEFORE_CHANGE = 190,
     PROP_VALUE_SET = 191,
     PROP_VALUE_CHANGE_TIME = 192,
+
     /* enumerations 193-206 are new */
     PROP_ALIGN_INTERVALS = 193,
+
     /* enumeration 194 is unassigned */
     PROP_INTERVAL_OFFSET = 195,
     PROP_LAST_RESTART_REASON = 196,
     PROP_LOGGING_TYPE = 197,
+
     /* enumeration 198-201 is unassigned */
     PROP_RESTART_NOTIFICATION_RECIPIENTS = 202,
     PROP_TIME_OF_DEVICE_RESTART = 203,
     PROP_TIME_SYNCHRONIZATION_INTERVAL = 204,
     PROP_TRIGGER = 205,
     PROP_UTC_TIME_SYNCHRONIZATION_RECIPIENTS = 206,
+
     /* enumerations 207-211 are used in Addendum d to ANSI/ASHRAE 135-2004 */
     PROP_NODE_SUBTYPE = 207,
     PROP_NODE_TYPE = 208,
     PROP_STRUCTURED_OBJECT_LIST = 209,
     PROP_SUBORDINATE_ANNOTATIONS = 210,
     PROP_SUBORDINATE_LIST = 211,
+
     /* enumerations 212-225 are used in Addendum e to ANSI/ASHRAE 135-2004 */
     PROP_ACTUAL_SHED_LEVEL = 212,
     PROP_DUTY_WINDOW = 213,
     PROP_EXPECTED_SHED_LEVEL = 214,
     PROP_FULL_DUTY_BASELINE = 215,
+
     /* enumerations 216-217 are unassigned */
     /* enumerations 212-225 are used in Addendum e to ANSI/ASHRAE 135-2004 */
     PROP_REQUESTED_SHED_LEVEL = 218,
@@ -227,6 +234,7 @@ public enum BacnetPropertyIds
     PROP_SHED_LEVEL_DESCRIPTIONS = 220,
     PROP_SHED_LEVELS = 221,
     PROP_STATE_DESCRIPTION = 222,
+
     /* enumerations 223-225 are unassigned  */
     /* enumerations 226-235 are used in Addendum f to ANSI/ASHRAE 135-2004 */
     PROP_DOOR_ALARM_STATE = 226,
@@ -239,6 +247,7 @@ public enum BacnetPropertyIds
     PROP_LOCK_STATUS = 233,
     PROP_MASKED_ALARM_VALUES = 234,
     PROP_SECURED_STATUS = 235,
+
     /* enumerations 236-243 are unassigned  */
     /* enumerations 244-311 are used in Addendum j to ANSI/ASHRAE 135-2004 */
     PROP_ABSENTEE_LIMIT = 244,
@@ -309,6 +318,7 @@ public enum BacnetPropertyIds
     PROP_TRANSACTION_NOTIFICATION_CLASS = 309,
     PROP_USER_EXTERNAL_IDENTIFIER = 310,
     PROP_USER_INFORMATION_REFERENCE = 311,
+
     /* enumerations 312-316 are unassigned */
     PROP_USER_NAME = 317,
     PROP_USER_TYPE = 318,
@@ -317,6 +327,7 @@ public enum BacnetPropertyIds
     PROP_ZONE_TO = 321,
     PROP_ACCESS_EVENT_TAG = 322,
     PROP_GLOBAL_IDENTIFIER = 323,
+
     /* enumerations 324-325 are unassigned */
     PROP_VERIFICATION_TIME = 326,
     PROP_BASE_DEVICE_SECURITY_POLICY = 327,
@@ -334,6 +345,7 @@ public enum BacnetPropertyIds
     PROP_BACKUP_PREPARATION_TIME = 339,
     PROP_RESTORE_COMPLETION_TIME = 340,
     PROP_RESTORE_PREPARATION_TIME = 341,
+
     /* enumerations 342-344 are defined in Addendum 2008-w */
     PROP_BIT_MASK = 342,
     PROP_BIT_TEXT = 343,
@@ -345,6 +357,7 @@ public enum BacnetPropertyIds
     PROP_COVU_PERIOD = 349,
     PROP_COVU_RECIPIENTS = 350,
     PROP_EVENT_MESSAGE_TEXTS = 351,
+
     /* enumerations 352-363 are defined in Addendum 2010-af */
     PROP_EVENT_MESSAGE_TEXTS_CONFIG = 352,
     PROP_EVENT_DETECTION_ENABLE = 353,
@@ -358,8 +371,10 @@ public enum BacnetPropertyIds
     PROP_PROCESS_IDENTIFIER_FILTER = 361,
     PROP_SUBSCRIBED_RECIPIENTS = 362,
     PROP_PORT_FILTER = 363,
+
     /* enumeration 364 is defined in Addendum 2010-ae */
     PROP_AUTHORIZATION_EXEMPTIONS = 364,
+
     /* enumerations 365-370 are defined in Addendum 2010-aa */
     PROP_ALLOW_GROUP_DELAY_INHIBIT = 365,
     PROP_CHANNEL_NUMBER = 366,
@@ -367,10 +382,13 @@ public enum BacnetPropertyIds
     PROP_EXECUTION_DELAY = 368,
     PROP_LAST_PRIORITY = 369,
     PROP_WRITE_STATUS = 370,
+
     /* enumeration 371 is defined in Addendum 2010-ao */
     PROP_PROPERTY_LIST = 371,
+
     /* enumeration 372 is defined in Addendum 2010-ak */
     PROP_SERIAL_NUMBER = 372,
+
     /* enumerations 373-386 are defined in Addendum 2010-i */
     PROP_BLINK_WARN_ENABLE = 373,
     PROP_DEFAULT_FADE_TIME = 374,
@@ -390,9 +408,11 @@ public enum BacnetPropertyIds
     PROP_FAULT_HIGH_LIMIT = 388,
     PROP_FAULT_LOW_LIMIT = 389,
     PROP_LOW_DIFF_LIMIT = 390,
+
     /* enumerations 391-392 are defined in Addendum 135-2012az */
     PROP_STRIKE_COUNT = 391,
     PROP_TIME_OF_STRIKE_COUNT_RESET = 392,
+
     /* enumerations 393-398 are defined in Addendum 135-2012ay */
     PROP_DEFAULT_TIMEOUT = 393,
     PROP_INITIAL_TIMEOUT = 394,
@@ -400,6 +420,7 @@ public enum BacnetPropertyIds
     PROP_STATE_CHANGE_VALUES = 396,
     PROP_TIMER_RUNNING = 397,
     PROP_TIMER_STATE = 398,
+
     /* enumerations 399-427 are defined in Addendum 2012-ai */
     PROP_APDU_LENGTH = 399,
     PROP_IP_ADDRESS = 400,
@@ -470,6 +491,7 @@ public enum BacnetPropertyIds
     PROP_FAULT_SIGNALS = 463,
     PROP_FLOOR_TEXT = 464,
     PROP_GROUP_ID = 465,
+
     /* value 466 is unassigned */
     PROP_GROUP_MODE = 467,
     PROP_HIGHER_DECK = 468,
@@ -512,11 +534,13 @@ public enum BacnetPropertyIds
     PROP_SEND_NOW = 505,
     PROP_FLOOR_NUMBER = 506,
     PROP_DEVICE_UUID = 507,
+
     /* enumerations 508-511 are defined in Addendum 2020cc */
     PROP_ADDITIONAL_REFERENCE_PORTS = 508,
     PROP_CERTIFICATE_SIGNING_REQUEST_FILE = 509,
     PROP_COMMAND_VALIDATION_RESULT = 510,
     PROP_ISSUER_CERTIFICATE_FILES = 511,
+
     /* The special property identifiers all, optional, and required  */
     /* are reserved for use in the ReadPropertyConditional and */
     /* ReadPropertyMultiple services or services not defined in this standard.
@@ -526,6 +550,7 @@ public enum BacnetPropertyIds
     /* procedures and constraints described in Clause 23.  */
     PROP_PROPRIETARY_RANGE_MIN = 512,
     PROP_PROPRIETARY_RANGE_MAX = 4194303,
+
     /* enumerations 4194304-4194327 are defined in Addendum 2020cc */
     PROP_MAX_BVLC_LENGTH_ACCEPTED = 4194304,
     PROP_MAX_NPDU_LENGTH_ACCEPTED = 4194305,
@@ -551,6 +576,7 @@ public enum BacnetPropertyIds
     PROP_SC_PRIMARY_HUB_URI = 4194325,
     PROP_SC_MAXIMUM_RECONNECT_TIME = 4194326,
     PROP_SC_MINIMUM_RECONNECT_TIME = 4194327,
+
     /* enumerations 4194328-4194332 are defined in Addendum 2020ca */
     PROP_COLOR_OVERRIDE = 4194328,
     PROP_COLOR_REFERENCE = 4194329,

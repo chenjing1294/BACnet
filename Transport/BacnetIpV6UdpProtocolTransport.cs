@@ -1,28 +1,28 @@
 ﻿/**************************************************************************
-*                           MIT License
-* 
-* Copyright (C) 2015 Frederic Chaxel <fchaxel@free.fr> 
-*                    Morten Kvistgaard <mk@pch-engineering.dk>
-* Permission is hereby granted, free of charge, to any person obtaining
-* a copy of this software and associated documentation files (the
-* "Software"), to deal in the Software without restriction, including
-* without limitation the rights to use, copy, modify, merge, publish,
-* distribute, sublicense, and/or sell copies of the Software, and to
-* permit persons to whom the Software is furnished to do so, subject to
-* the following conditions:
-*
-* The above copyright notice and this permission notice shall be included
-* in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*
-*********************************************************************/
+ *                           MIT License
+ *
+ * Copyright (C) 2015 Frederic Chaxel <fchaxel@free.fr>
+ *                    Morten Kvistgaard <mk@pch-engineering.dk>
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *********************************************************************/
 
 // based on Addendum 135-2012aj-4
 
@@ -43,7 +43,7 @@ public class BacnetIpV6UdpProtocolTransport : BacnetTransportBase
     // Give [::]:xxxx if the socket is open with System.Net.IPAddress.IPv6Any
     // Used the bvlc layer class in BBMD mode
     // Some more complex solutions could avoid this, that's why this property is virtual
-    public virtual IPEndPoint LocalEndPoint => (IPEndPoint)_exclusiveConn.Client.LocalEndPoint;
+    public virtual IPEndPoint LocalEndPoint => (IPEndPoint) _exclusiveConn.Client.LocalEndPoint;
 
     public BacnetIpV6UdpProtocolTransport(int port, int vMac = -1, bool useExclusivePort = false,
         bool dontFragment = false, int maxPayload = 1472, string localEndpointIp = "")
@@ -85,12 +85,14 @@ public class BacnetIpV6UdpProtocolTransport : BacnetTransportBase
             Array.Copy(buffer, 3, newBuffer, 0, fullLength - 3);
             fullLength -= 3;
             buffer = newBuffer;
-            Bvlc.Encode(buffer, offset - BVLCV6.BVLC_HEADER_LENGTH,
+            Bvlc.Encode(
+                buffer, offset - BVLCV6.BVLC_HEADER_LENGTH,
                 BacnetBvlcV6Functions.BVLC_ORIGINAL_BROADCAST_NPDU, fullLength, address);
         }
         else
         {
-            Bvlc.Encode(buffer, offset - BVLCV6.BVLC_HEADER_LENGTH, BacnetBvlcV6Functions.BVLC_ORIGINAL_UNICAST_NPDU,
+            Bvlc.Encode(
+                buffer, offset - BVLCV6.BVLC_HEADER_LENGTH, BacnetBvlcV6Functions.BVLC_ORIGINAL_UNICAST_NPDU,
                 fullLength, address);
         }
 
@@ -153,7 +155,7 @@ public class BacnetIpV6UdpProtocolTransport : BacnetTransportBase
             /* We (might) only receive the multicast on this. Any unicasts to this might be eaten by another local client */
             if (_sharedConn == null)
             {
-                _sharedConn = new UdpClient(AddressFamily.InterNetworkV6) { ExclusiveAddressUse = false };
+                _sharedConn = new UdpClient(AddressFamily.InterNetworkV6) {ExclusiveAddressUse = false};
                 _sharedConn.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 EndPoint ep = new IPEndPoint(IPAddress.IPv6Any, SharedPort);
                 if (!string.IsNullOrEmpty(_localEndpoint))
@@ -161,13 +163,14 @@ public class BacnetIpV6UdpProtocolTransport : BacnetTransportBase
                 _sharedConn.Client.Bind(ep);
                 multicastListener = _sharedConn;
             }
+
             /* This is our own exclusive port. We'll recieve everything sent to this. */
             /* So this is how we'll present our selves to the world */
             if (_exclusiveConn == null)
             {
                 EndPoint ep = new IPEndPoint(IPAddress.IPv6Any, 0);
                 if (!string.IsNullOrEmpty(_localEndpoint)) ep = new IPEndPoint(IPAddress.Parse(_localEndpoint), 0);
-                _exclusiveConn = new UdpClient((IPEndPoint)ep);
+                _exclusiveConn = new UdpClient((IPEndPoint) ep);
             }
         }
         else
@@ -179,7 +182,7 @@ public class BacnetIpV6UdpProtocolTransport : BacnetTransportBase
             {
                 ExclusiveAddressUse = true
             };
-            _exclusiveConn.Client.Bind((IPEndPoint)ep);
+            _exclusiveConn.Client.Bind((IPEndPoint) ep);
             multicastListener = _exclusiveConn;
         }
 
@@ -203,7 +206,7 @@ public class BacnetIpV6UdpProtocolTransport : BacnetTransportBase
 
     private void OnReceiveData(IAsyncResult asyncResult)
     {
-        var conn = (UdpClient)asyncResult.AsyncState;
+        var conn = (UdpClient) asyncResult.AsyncState;
         try
         {
             var ep = new IPEndPoint(IPAddress.Any, 0);
@@ -345,7 +348,7 @@ public class BacnetIpV6UdpProtocolTransport : BacnetTransportBase
     public static void Convert(IPEndPoint ep, out BacnetAddress address)
     {
         var tmp1 = ep.Address.GetAddressBytes();
-        var tmp2 = BitConverter.GetBytes((ushort)ep.Port);
+        var tmp2 = BitConverter.GetBytes((ushort) ep.Port);
         Array.Reverse(tmp2);
         Array.Resize(ref tmp1, tmp1.Length + tmp2.Length);
         Array.Copy(tmp2, 0, tmp1, tmp1.Length - tmp2.Length, tmp2.Length);
@@ -354,7 +357,7 @@ public class BacnetIpV6UdpProtocolTransport : BacnetTransportBase
 
     public static void Convert(BacnetAddress address, out IPEndPoint ep)
     {
-        var port = (ushort)((address.adr[16] << 8) | (address.adr[17] << 0));
+        var port = (ushort) ((address.adr[16] << 8) | (address.adr[17] << 0));
         var ipv6 = new byte[16];
         Array.Copy(address.adr, ipv6, 16);
         ep = new IPEndPoint(new IPAddress(ipv6), port);

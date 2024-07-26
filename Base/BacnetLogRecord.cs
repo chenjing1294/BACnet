@@ -6,6 +6,7 @@ public struct BacnetLogRecord
 
     /* logDatum: CHOICE { */
     public BacnetTrendLogValueType type;
+
     //private BacnetBitString log_status;
     //private bool boolean_value;
     //private float real_value;
@@ -39,28 +40,28 @@ public struct BacnetLogRecord
                 case BacnetTrendLogValueType.TL_TYPE_ANY:
                     return any_value;
                 case BacnetTrendLogValueType.TL_TYPE_BITS:
-                    return (BacnetBitString)Convert.ChangeType(any_value, typeof(BacnetBitString));
+                    return (BacnetBitString) Convert.ChangeType(any_value, typeof(BacnetBitString));
                 case BacnetTrendLogValueType.TL_TYPE_BOOL:
-                    return (bool)Convert.ChangeType(any_value, typeof(bool));
+                    return (bool) Convert.ChangeType(any_value, typeof(bool));
                 case BacnetTrendLogValueType.TL_TYPE_DELTA:
-                    return (float)Convert.ChangeType(any_value, typeof(float));
+                    return (float) Convert.ChangeType(any_value, typeof(float));
                 case BacnetTrendLogValueType.TL_TYPE_ENUM:
-                    return (uint)Convert.ChangeType(any_value, typeof(uint));
+                    return (uint) Convert.ChangeType(any_value, typeof(uint));
                 case BacnetTrendLogValueType.TL_TYPE_ERROR:
                     if (any_value != null)
-                        return (BacnetError)Convert.ChangeType(any_value, typeof(BacnetError));
+                        return (BacnetError) Convert.ChangeType(any_value, typeof(BacnetError));
                     else
                         return new BacnetError(BacnetErrorClasses.ERROR_CLASS_DEVICE, BacnetErrorCodes.ERROR_CODE_ABORT_OTHER);
                 case BacnetTrendLogValueType.TL_TYPE_NULL:
                     return null;
                 case BacnetTrendLogValueType.TL_TYPE_REAL:
-                    return (float)Convert.ChangeType(any_value, typeof(float));
+                    return (float) Convert.ChangeType(any_value, typeof(float));
                 case BacnetTrendLogValueType.TL_TYPE_SIGN:
-                    return (int)Convert.ChangeType(any_value, typeof(int));
+                    return (int) Convert.ChangeType(any_value, typeof(int));
                 case BacnetTrendLogValueType.TL_TYPE_STATUS:
-                    return (BacnetBitString)Convert.ChangeType(any_value, typeof(BacnetBitString));
+                    return (BacnetBitString) Convert.ChangeType(any_value, typeof(BacnetBitString));
                 case BacnetTrendLogValueType.TL_TYPE_UNSIGN:
-                    return (uint)Convert.ChangeType(any_value, typeof(uint));
+                    return (uint) Convert.ChangeType(any_value, typeof(uint));
                 default:
                     throw new NotSupportedException();
             }
@@ -75,60 +76,60 @@ public struct BacnetLogRecord
                 case BacnetTrendLogValueType.TL_TYPE_BITS:
                     if (value == null) value = new BacnetBitString();
                     if (value.GetType() != typeof(BacnetBitString))
-                        value = BacnetBitString.ConvertFromInt((uint)Convert.ChangeType(value, typeof(uint)));
-                    any_value = (BacnetBitString)value;
+                        value = BacnetBitString.ConvertFromInt((uint) Convert.ChangeType(value, typeof(uint)));
+                    any_value = (BacnetBitString) value;
                     break;
                 case BacnetTrendLogValueType.TL_TYPE_BOOL:
                     if (value == null) value = false;
                     if (value.GetType() != typeof(bool))
-                        value = (bool)Convert.ChangeType(value, typeof(bool));
-                    any_value = (bool)value;
+                        value = (bool) Convert.ChangeType(value, typeof(bool));
+                    any_value = (bool) value;
                     break;
                 case BacnetTrendLogValueType.TL_TYPE_DELTA:
-                    if (value == null) value = (float)0;
+                    if (value == null) value = (float) 0;
                     if (value.GetType() != typeof(float))
-                        value = (float)Convert.ChangeType(value, typeof(float));
-                    any_value = (float)value;
+                        value = (float) Convert.ChangeType(value, typeof(float));
+                    any_value = (float) value;
                     break;
                 case BacnetTrendLogValueType.TL_TYPE_ENUM:
-                    if (value == null) value = (uint)0;
+                    if (value == null) value = (uint) 0;
                     if (value.GetType() != typeof(uint))
-                        value = (uint)Convert.ChangeType(value, typeof(uint));
-                    any_value = (uint)value;
+                        value = (uint) Convert.ChangeType(value, typeof(uint));
+                    any_value = (uint) value;
                     break;
                 case BacnetTrendLogValueType.TL_TYPE_ERROR:
                     if (value == null) value = new BacnetError();
                     if (value.GetType() != typeof(BacnetError))
                         throw new ArgumentException();
-                    any_value = (BacnetError)value;
+                    any_value = (BacnetError) value;
                     break;
                 case BacnetTrendLogValueType.TL_TYPE_NULL:
                     if (value != null) throw new ArgumentException();
                     any_value = value;
                     break;
                 case BacnetTrendLogValueType.TL_TYPE_REAL:
-                    if (value == null) value = (float)0;
+                    if (value == null) value = (float) 0;
                     if (value.GetType() != typeof(float))
-                        value = (float)Convert.ChangeType(value, typeof(float));
-                    any_value = (float)value;
+                        value = (float) Convert.ChangeType(value, typeof(float));
+                    any_value = (float) value;
                     break;
                 case BacnetTrendLogValueType.TL_TYPE_SIGN:
                     if (value == null) value = 0;
                     if (value.GetType() != typeof(int))
-                        value = (int)Convert.ChangeType(value, typeof(int));
-                    any_value = (int)value;
+                        value = (int) Convert.ChangeType(value, typeof(int));
+                    any_value = (int) value;
                     break;
                 case BacnetTrendLogValueType.TL_TYPE_STATUS:
                     if (value == null) value = new BacnetBitString();
                     if (value.GetType() != typeof(BacnetBitString))
-                        value = BacnetBitString.ConvertFromInt((uint)Convert.ChangeType(value, typeof(uint)));
-                    any_value = (BacnetBitString)value;
+                        value = BacnetBitString.ConvertFromInt((uint) Convert.ChangeType(value, typeof(uint)));
+                    any_value = (BacnetBitString) value;
                     break;
                 case BacnetTrendLogValueType.TL_TYPE_UNSIGN:
-                    if (value == null) value = (uint)0;
+                    if (value == null) value = (uint) 0;
                     if (value.GetType() != typeof(uint))
-                        value = (uint)Convert.ChangeType(value, typeof(uint));
-                    any_value = (uint)value;
+                        value = (uint) Convert.ChangeType(value, typeof(uint));
+                    any_value = (uint) value;
                     break;
                 default:
                     throw new NotSupportedException();
@@ -138,6 +139,6 @@ public struct BacnetLogRecord
 
     public T GetValue<T>()
     {
-        return (T)Convert.ChangeType(Value, typeof(T));
+        return (T) Convert.ChangeType(Value, typeof(T));
     }
 }

@@ -20,5 +20,5 @@ public enum BacnetPtpFrameTypes : byte
     FRAME_TYPE_DISCONNECT_RESPONSE = 0x0F,
     FRAME_TYPE_TEST_REQUEST = 0x14,
     FRAME_TYPE_TEST_RESPONSE = 0x15,
-    FRAME_TYPE_GREETING = 0xFF     //special invention
+    FRAME_TYPE_GREETING = 0xFF //special invention
 }

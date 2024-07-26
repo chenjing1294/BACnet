@@ -4,11 +4,13 @@ namespace System.IO.BACnet;
 public enum BacnetUnitsId
 {
     UNITS_METERS_PER_SECOND_PER_SECOND = 166,
+
     /* Area */
     UNITS_SQUARE_METERS = 0,
     UNITS_SQUARE_CENTIMETERS = 116,
     UNITS_SQUARE_FEET = 1,
     UNITS_SQUARE_INCHES = 115,
+
     /* Currency */
     UNITS_CURRENCY1 = 105,
     UNITS_CURRENCY2 = 106,
@@ -20,6 +22,7 @@ public enum BacnetUnitsId
     UNITS_CURRENCY8 = 112,
     UNITS_CURRENCY9 = 113,
     UNITS_CURRENCY10 = 114,
+
     /* Electrical */
     UNITS_MILLIAMPERES = 2,
     UNITS_AMPERES = 3,
@@ -38,7 +41,7 @@ public enum BacnetUnitsId
     UNITS_MEGOHMS = 123,
     UNITS_MICROSIEMENS = 190,
     UNITS_MILLISIEMENS = 202,
-    UNITS_SIEMENS = 173,        /* 1 mho equals 1 siemens */
+    UNITS_SIEMENS = 173, /* 1 mho equals 1 siemens */
     UNITS_SIEMENS_PER_METER = 174,
     UNITS_TESLAS = 175,
     UNITS_VOLTS = 5,
@@ -56,6 +59,7 @@ public enum BacnetUnitsId
     UNITS_DEGREES_PHASE = 14,
     UNITS_POWER_FACTOR = 15,
     UNITS_WEBERS = 178,
+
     /* Energy */
     UNITS_JOULES = 16,
     UNITS_KILOJOULES = 17,
@@ -72,19 +76,23 @@ public enum BacnetUnitsId
     UNITS_MEGA_BTUS = 148,
     UNITS_THERMS = 21,
     UNITS_TON_HOURS = 22,
+
     /* Enthalpy */
     UNITS_JOULES_PER_KILOGRAM_DRY_AIR = 23,
     UNITS_KILOJOULES_PER_KILOGRAM_DRY_AIR = 149,
     UNITS_MEGAJOULES_PER_KILOGRAM_DRY_AIR = 150,
     UNITS_BTUS_PER_POUND_DRY_AIR = 24,
     UNITS_BTUS_PER_POUND = 117,
+
     /* Entropy */
     UNITS_JOULES_PER_DEGREE_KELVIN = 127,
     UNITS_KILOJOULES_PER_DEGREE_KELVIN = 151,
     UNITS_MEGAJOULES_PER_DEGREE_KELVIN = 152,
     UNITS_JOULES_PER_KILOGRAM_DEGREE_KELVIN = 128,
+
     /* Force */
     UNITS_NEWTON = 153,
+
     /* Frequency */
     UNITS_CYCLES_PER_HOUR = 25,
     UNITS_CYCLES_PER_MINUTE = 26,
@@ -92,9 +100,11 @@ public enum BacnetUnitsId
     UNITS_KILOHERTZ = 129,
     UNITS_MEGAHERTZ = 130,
     UNITS_PER_HOUR = 131,
+
     /* Humidity */
     UNITS_GRAMS_OF_WATER_PER_KILOGRAM_DRY_AIR = 28,
     UNITS_PERCENT_RELATIVE_HUMIDITY = 29,
+
     /* Length */
     UNITS_MICROMETERS = 194,
     UNITS_MILLIMETERS = 30,
@@ -103,6 +113,7 @@ public enum BacnetUnitsId
     UNITS_METERS = 31,
     UNITS_INCHES = 32,
     UNITS_FEET = 33,
+
     /* Light */
     UNITS_CANDELAS = 179,
     UNITS_CANDELAS_PER_SQUARE_METER = 180,
@@ -111,12 +122,14 @@ public enum BacnetUnitsId
     UNITS_LUMENS = 36,
     UNITS_LUXES = 37,
     UNITS_FOOT_CANDLES = 38,
+
     /* Mass */
     UNITS_MILLIGRAMS = 196,
     UNITS_GRAMS = 195,
     UNITS_KILOGRAMS = 39,
     UNITS_POUNDS_MASS = 40,
     UNITS_TONS = 41,
+
     /* Mass Flow */
     UNITS_GRAMS_PER_SECOND = 154,
     UNITS_GRAMS_PER_MINUTE = 155,
@@ -127,6 +140,7 @@ public enum BacnetUnitsId
     UNITS_POUNDS_MASS_PER_MINUTE = 45,
     UNITS_POUNDS_MASS_PER_HOUR = 46,
     UNITS_TONS_PER_HOUR = 156,
+
     /* Power */
     UNITS_MILLIWATTS = 132,
     UNITS_WATTS = 47,
@@ -136,6 +150,7 @@ public enum BacnetUnitsId
     UNITS_KILO_BTUS_PER_HOUR = 157,
     UNITS_HORSEPOWER = 51,
     UNITS_TONS_REFRIGERATION = 52,
+
     /* Pressure */
     UNITS_PASCALS = 53,
     UNITS_HECTOPASCALS = 133,
@@ -149,6 +164,7 @@ public enum BacnetUnitsId
     UNITS_MILLIMETERS_OF_MERCURY = 59,
     UNITS_CENTIMETERS_OF_MERCURY = 60,
     UNITS_INCHES_OF_MERCURY = 61,
+
     /* Temperature */
     UNITS_DEGREES_CELSIUS = 62,
     UNITS_DEGREES_KELVIN = 63,
@@ -159,6 +175,7 @@ public enum BacnetUnitsId
     UNITS_DEGREE_DAYS_FAHRENHEIT = 66,
     UNITS_DELTA_DEGREES_FAHRENHEIT = 120,
     UNITS_DELTA_DEGREES_KELVIN = 121,
+
     /* Time */
     UNITS_YEARS = 67,
     UNITS_MONTHS = 68,
@@ -169,8 +186,10 @@ public enum BacnetUnitsId
     UNITS_SECONDS = 73,
     UNITS_HUNDREDTHS_SECONDS = 158,
     UNITS_MILLISECONDS = 159,
+
     /* Torque */
     UNITS_NEWTON_METERS = 160,
+
     /* Velocity */
     UNITS_MILLIMETERS_PER_SECOND = 161,
     UNITS_MILLIMETERS_PER_MINUTE = 162,
@@ -181,6 +200,7 @@ public enum BacnetUnitsId
     UNITS_FEET_PER_SECOND = 76,
     UNITS_FEET_PER_MINUTE = 77,
     UNITS_MILES_PER_HOUR = 78,
+
     /* Volume */
     UNITS_CUBIC_FEET = 79,
     UNITS_CUBIC_METERS = 80,
@@ -188,12 +208,15 @@ public enum BacnetUnitsId
     UNITS_MILLILITERS = 197,
     UNITS_LITERS = 82,
     UNITS_US_GALLONS = 83,
+
     /* Volumetric Flow */
     UNITS_CUBIC_FEET_PER_SECOND = 142,
     UNITS_CUBIC_FEET_PER_MINUTE = 84,
+
     // One unit in Addendum 135-2012bg
     UNITS_MILLION_CUBIC_FEET_PER_MINUTE = 254,
     UNITS_CUBIC_FEET_PER_HOUR = 191,
+
     // five units in Addendum 135-2012bg
     UNITS_STANDARD_CUBIC_FEET_PER_DAY = 47808,
     UNITS_MILLION_STANDARD_CUBIC_FEET_PER_DAY = 47809,
@@ -210,6 +233,7 @@ public enum BacnetUnitsId
     UNITS_LITERS_PER_HOUR = 136,
     UNITS_US_GALLONS_PER_MINUTE = 89,
     UNITS_US_GALLONS_PER_HOUR = 192,
+
     /* Other */
     UNITS_DEGREES_ANGULAR = 90,
     UNITS_DEGREES_CELSIUS_PER_HOUR = 91,
@@ -269,6 +293,7 @@ public enum BacnetUnitsId
     UNITS_NEPHELOMETRIC_TURBIDITY_UNIT = 233,
     UNITS_PH = 234,
     UNITS_GRAMS_PER_SQUARE_METER = 235,
+
     // Since Addendum 135-2012ar
     UNITS_MINUTES_PER_DEGREE_KELVIN = 236,
     UNITS_METER_SQUARED_PER_METER = 237,
@@ -290,18 +315,22 @@ public enum BacnetUnitsId
     UNITS_PASCAL_SECONDS = 253,
     UNITS_MILLION_STANDARD_CUBIC_FEET_PER_MINUTE = 254,
     UNITS_RESERVED_RANGE_MAX = 255,
+
     /* Enumerated values 256-47807 may be used by others
        subject to the procedures and constraints described in Clause 23. */
     UNITS_PROPRIETARY_RANGE_MIN = 256,
     UNITS_PROPRIETARY_RANGE_MAX = 47807,
+
     /* Enumerated values 47808-49999 are reserved for definition by ASHRAE. */
     UNITS_RESERVED_RANGE_MIN2 = 47808,
     UNITS_POUNDS_MASS_PER_DAY = 47812,
+
     /* 47813 - NOT USED */
     UNITS_MILLIREMS = 47814,
     UNITS_MILLIREMS_PER_HOUR = 47815,
     UNITS_RESERVED_RANGE_MAX2 = 49999,
     UNITS_PROPRIETARY_RANGE_MIN2 = 50000,
+
     /* Enumerated values 50000-65535 may be used by others
        subject to the procedures and constraints described in Clause 23. */
     /* do the proprietary range inside of enum so that

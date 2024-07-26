@@ -34,9 +34,10 @@ public class BacnetAddress : ASN1.IEncode
                 var addressBytes = IPAddress.Parse(addressParts[0]).GetAddressBytes();
                 Array.Copy(addressBytes, adr, addressBytes.Length);
 
-                var portBytes = BitConverter.GetBytes(addressParts.Length > 1
-                    ? ushort.Parse(addressParts[1])
-                    : (ushort)0xBAC0);
+                var portBytes = BitConverter.GetBytes(
+                    addressParts.Length > 1
+                        ? ushort.Parse(addressParts[1])
+                        : (ushort) 0xBAC0);
 
                 if (BitConverter.IsLittleEndian)
                     portBytes = portBytes.Reverse().ToArray();
@@ -55,9 +56,7 @@ public class BacnetAddress : ASN1.IEncode
 
     public override int GetHashCode()
     {
-        // DAL this was originally broken...
-        var str = Convert.ToBase64String(adr);
-        return str.GetHashCode();
+        return (adr != null ? adr.GetHashCode() : 0);
     }
 
     public override string ToString()
@@ -137,6 +136,18 @@ public class BacnetAddress : ASN1.IEncode
     public override bool Equals(object obj)
     {
         if (obj is not BacnetAddress) return false;
+        var d = (BacnetAddress) obj;
+        if (adr == null && d.adr == null) return true;
+        if (adr == null || d.adr == null) return false;
+        if (adr.Length != d.adr.Length) return false;
+        if (adr.Where((t, i) => t != d.adr[i]).Any())
+            return false;
+        return true;
+    }
+
+    /*public override bool Equals(object obj)
+    {
+        if (obj is not BacnetAddress) return false;
         var d = (BacnetAddress)obj;
         if (adr == null && d.adr == null) return true;
         if (adr == null || d.adr == null) return false;
@@ -159,7 +170,7 @@ public class BacnetAddress : ASN1.IEncode
         bool rv = RoutedSource?.Equals(d.RoutedSource) ?? false;
         rv |= RoutedDestination?.Equals(d.RoutedDestination) ?? false;
         return rv;
-    }
+    }*/
 
     // checked if device is routed by curent equipement
     public bool IsMyRouter(BacnetAddress device)
@@ -183,7 +194,7 @@ public class BacnetAddress : ASN1.IEncode
 
     public string FullHashString()
     {
-        var hash = $"{(uint)type}.{net}.{string.Concat(adr.Select(a => a.ToString("X2")))}";
+        var hash = $"{(uint) type}.{net}.{string.Concat(adr.Select(a => a.ToString("X2")))}";
 
         if (RoutedSource != null)
             hash += $":{RoutedSource.FullHashString()}";

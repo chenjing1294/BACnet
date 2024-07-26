@@ -12,6 +12,7 @@ public enum BacnetLifeSafetyOperations
     LIFE_SAFETY_OP_UNSILENCE = 7,
     LIFE_SAFETY_OP_UNSILENCE_AUDIBLE = 8,
     LIFE_SAFETY_OP_UNSILENCE_VISUAL = 9,
+
     /* Enumerated values 0-63 are reserved for definition by ASHRAE.  */
     /* Enumerated values 64-65535 may be used by others subject to  */
     /* procedures and constraints described in Clause 23. */

@@ -10,11 +10,13 @@ public struct BacnetError
         error_class = errorClass;
         error_code = errorCode;
     }
+
     public BacnetError(uint errorClass, uint errorCode)
     {
-        error_class = (BacnetErrorClasses)errorClass;
-        error_code = (BacnetErrorCodes)errorCode;
+        error_class = (BacnetErrorClasses) errorClass;
+        error_code = (BacnetErrorCodes) errorCode;
     }
+
     public override string ToString()
     {
         return $"{error_class}: {error_code}";

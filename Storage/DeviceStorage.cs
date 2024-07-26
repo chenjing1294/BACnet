@@ -1,28 +1,28 @@
 ﻿/**************************************************************************
-*                           MIT License
-* 
-* Copyright (C) 2014 Morten Kvistgaard <mk@pch-engineering.dk>
-*
-* Permission is hereby granted, free of charge, to any person obtaining
-* a copy of this software and associated documentation files (the
-* "Software"), to deal in the Software without restriction, including
-* without limitation the rights to use, copy, modify, merge, publish,
-* distribute, sublicense, and/or sell copies of the Software, and to
-* permit persons to whom the Software is furnished to do so, subject to
-* the following conditions:
-*
-* The above copyright notice and this permission notice shall be included
-* in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*
-*********************************************************************/
+ *                           MIT License
+ *
+ * Copyright (C) 2014 Morten Kvistgaard <mk@pch-engineering.dk>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *********************************************************************/
 
 namespace System.IO.BACnet.Storage;
 
@@ -36,17 +36,22 @@ public class DeviceStorage
     public uint DeviceId { get; set; }
 
     public delegate void ChangeOfValueHandler(DeviceStorage sender, BacnetObjectId objectId, BacnetPropertyIds propertyId, uint arrayIndex, IList<BacnetValue> value);
+
     public event ChangeOfValueHandler ChangeOfValue;
+
     public delegate void ReadOverrideHandler(BacnetObjectId objectId, BacnetPropertyIds propertyId, uint arrayIndex, out IList<BacnetValue> value, out ErrorCodes status, out bool handled);
+
     public event ReadOverrideHandler ReadOverride;
+
     public delegate void WriteOverrideHandler(BacnetObjectId objectId, BacnetPropertyIds propertyId, uint arrayIndex, IList<BacnetValue> value, out ErrorCodes status, out bool handled);
+
     public event WriteOverrideHandler WriteOverride;
 
     public Object[] Objects { get; set; }
 
     public DeviceStorage()
     {
-        DeviceId = (uint)new Random().Next();
+        DeviceId = (uint) new Random().Next();
         Objects = new Object[0];
     }
 
@@ -94,7 +99,7 @@ public class DeviceStorage
         if (value == null || value.Count < 1)
             return 0;
 
-        return (int)Convert.ChangeType(value[0].Value, typeof(int));
+        return (int) Convert.ChangeType(value[0].Value, typeof(int));
     }
 
     public ErrorCodes ReadProperty(BacnetObjectId objectId, BacnetPropertyIds propertyId, uint arrayIndex, out IList<BacnetValue> value)
@@ -126,11 +131,11 @@ public class DeviceStorage
         //get value ... check for array index
         if (arrayIndex == 0)
         {
-            value = new[] { new BacnetValue(BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT, (uint)p.BacnetValue.Count) };
+            value = new[] {new BacnetValue(BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT, (uint) p.BacnetValue.Count)};
         }
         else if (arrayIndex != Serialize.ASN1.BACNET_ARRAY_ALL)
         {
-            value = new[] { p.BacnetValue[(int)arrayIndex - 1] };
+            value = new[] {p.BacnetValue[(int) arrayIndex - 1]};
         }
         else
         {
@@ -146,23 +151,25 @@ public class DeviceStorage
 
         foreach (var entry in properties)
         {
-            var newEntry = new BacnetPropertyValue { property = entry };
+            var newEntry = new BacnetPropertyValue {property = entry};
 
-            switch (ReadProperty(objectId, (BacnetPropertyIds)entry.propertyIdentifier, entry.propertyArrayIndex, out newEntry.value))
+            switch (ReadProperty(objectId, (BacnetPropertyIds) entry.propertyIdentifier, entry.propertyArrayIndex, out newEntry.value))
             {
                 case ErrorCodes.UnknownObject:
                     newEntry.value = new[]
                     {
-                            new BacnetValue(BacnetApplicationTags.BACNET_APPLICATION_TAG_ERROR,
+                        new BacnetValue(
+                            BacnetApplicationTags.BACNET_APPLICATION_TAG_ERROR,
                             new BacnetError(BacnetErrorClasses.ERROR_CLASS_OBJECT, BacnetErrorCodes.ERROR_CODE_UNKNOWN_OBJECT))
-                        };
+                    };
                     break;
                 case ErrorCodes.NotExist:
                     newEntry.value = new[]
                     {
-                            new BacnetValue(BacnetApplicationTags.BACNET_APPLICATION_TAG_ERROR,
+                        new BacnetValue(
+                            BacnetApplicationTags.BACNET_APPLICATION_TAG_ERROR,
                             new BacnetError(BacnetErrorClasses.ERROR_CLASS_PROPERTY, BacnetErrorCodes.ERROR_CODE_UNKNOWN_PROPERTY))
-                        };
+                    };
                     break;
             }
 
@@ -188,13 +195,13 @@ public class DeviceStorage
         {
             var newEntry = new BacnetPropertyValue
             {
-                property = new BacnetPropertyReference((uint)obj.Properties[i].Id, Serialize.ASN1.BACNET_ARRAY_ALL)
+                property = new BacnetPropertyReference((uint) obj.Properties[i].Id, Serialize.ASN1.BACNET_ARRAY_ALL)
             };
 
             if (ReadProperty(objectId, obj.Properties[i].Id, Serialize.ASN1.BACNET_ARRAY_ALL, out newEntry.value) != ErrorCodes.Good)
             {
                 var bacnetError = new BacnetError(BacnetErrorClasses.ERROR_CLASS_OBJECT, BacnetErrorCodes.ERROR_CODE_UNKNOWN_PROPERTY);
-                newEntry.value = new[] { new BacnetValue(BacnetApplicationTags.BACNET_APPLICATION_TAG_ERROR, bacnetError) };
+                newEntry.value = new[] {new BacnetValue(BacnetApplicationTags.BACNET_APPLICATION_TAG_ERROR, bacnetError)};
             }
 
             propertyValues[i] = newEntry;
@@ -214,8 +221,9 @@ public class DeviceStorage
             return;
 
         //write
-        WriteProperty(objectId, propertyId, Serialize.ASN1.BACNET_ARRAY_ALL, new[]
-        {
+        WriteProperty(
+            objectId, propertyId, Serialize.ASN1.BACNET_ARRAY_ALL, new[]
+            {
                 new BacnetValue(readValues[0].Tag, Convert.ChangeType(value, readValues[0].Value.GetType()))
             });
     }
@@ -223,7 +231,7 @@ public class DeviceStorage
 
     public void WriteProperty(BacnetObjectId objectId, BacnetPropertyIds propertyId, BacnetValue value)
     {
-        WriteProperty(objectId, propertyId, Serialize.ASN1.BACNET_ARRAY_ALL, new[] { value });
+        WriteProperty(objectId, propertyId, Serialize.ASN1.BACNET_ARRAY_ALL, new[] {value});
     }
 
     public ErrorCodes WriteProperty(BacnetObjectId objectId, BacnetPropertyIds propertyId, uint arrayIndex, IList<BacnetValue> value, bool addIfNotExits = false)
@@ -262,7 +270,7 @@ public class DeviceStorage
             }
 
             //add property
-            p = new Property { Id = propertyId };
+            p = new Property {Id = propertyId};
             var props = obj.Properties;
             Array.Resize(ref props, props.Length + 1);
             props[props.Length - 1] = p;
@@ -294,7 +302,6 @@ public class DeviceStorage
     // Write PROP_PRESENT_VALUE or PROP_RELINQUISH_DEFAULT in an object with a 16 level PROP_PRIORITY_ARRAY (BACNET_APPLICATION_TAG_NULL)
     public ErrorCodes WriteCommandableProperty(BacnetObjectId objectId, BacnetPropertyIds propertyId, BacnetValue value, uint priority)
     {
-
         if (propertyId != BacnetPropertyIds.PROP_PRESENT_VALUE)
             return ErrorCodes.NotForMe;
 
@@ -319,7 +326,7 @@ public class DeviceStorage
         try
         {
             // If PROP_OUT_OF_SERVICE=True, value is accepted as is : http://www.bacnetwiki.com/wiki/index.php?title=Priority_Array                 
-            if ((bool)outOfService.BacnetValue[0].Value && propertyId == BacnetPropertyIds.PROP_PRESENT_VALUE)
+            if ((bool) outOfService.BacnetValue[0].Value && propertyId == BacnetPropertyIds.PROP_PRESENT_VALUE)
             {
                 WriteProperty(objectId, BacnetPropertyIds.PROP_PRESENT_VALUE, value);
                 return ErrorCodes.Good;
@@ -342,16 +349,15 @@ public class DeviceStorage
 
                 valueArray = array.BacnetValue;
                 if (value.Value == null)
-                    valueArray[(int)priority - 1] = new BacnetValue(null);
+                    valueArray[(int) priority - 1] = new BacnetValue(null);
                 else
-                    valueArray[(int)priority - 1] = value;
+                    valueArray[(int) priority - 1] = value;
                 array.BacnetValue = valueArray;
             }
 
             // Look on the priority Array to find the first value to be set in PROP_PRESENT_VALUE
             if (errorcode == ErrorCodes.Good)
             {
-
                 var done = false;
                 for (var i = 0; i < 16; i++)
                 {
@@ -363,7 +369,7 @@ public class DeviceStorage
                     break;
                 }
 
-                if (done == false)  // Nothing in the array : PROP_PRESENT_VALUE = PROP_RELINQUISH_DEFAULT
+                if (done == false) // Nothing in the array : PROP_PRESENT_VALUE = PROP_RELINQUISH_DEFAULT
                 {
                     var defaultValue = relinquish.BacnetValue;
                     WriteProperty(objectId, BacnetPropertyIds.PROP_PRESENT_VALUE, defaultValue[0]);
@@ -381,7 +387,7 @@ public class DeviceStorage
     public ErrorCodes[] WritePropertyMultiple(BacnetObjectId objectId, ICollection<BacnetPropertyValue> values)
     {
         return values
-            .Select(v => WriteProperty(objectId, (BacnetPropertyIds)v.property.propertyIdentifier, v.property.propertyArrayIndex, v.value))
+            .Select(v => WriteProperty(objectId, (BacnetPropertyIds) v.property.propertyIdentifier, v.property.propertyArrayIndex, v.value))
             .ToArray();
     }
 
@@ -426,7 +432,7 @@ public class DeviceStorage
 
         using (textStreamReader)
         {
-            var ret = (DeviceStorage)s.Deserialize(textStreamReader);
+            var ret = (DeviceStorage) s.Deserialize(textStreamReader);
 
             //set device_id
             var obj = ret.FindObject(BacnetObjectTypes.OBJECT_DEVICE);
@@ -445,11 +451,13 @@ public class DeviceStorage
             obj.Instance = deviceId.Value;
             IList<BacnetValue> val = new[]
             {
-                    new BacnetValue(BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_ID, $"OBJECT_DEVICE:{deviceId.Value}")
-                };
+                new BacnetValue(BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_ID, $"OBJECT_DEVICE:{deviceId.Value}")
+            };
 
-            ret.WriteProperty(new BacnetObjectId(BacnetObjectTypes.OBJECT_DEVICE,
-                Serialize.ASN1.BACNET_MAX_INSTANCE), BacnetPropertyIds.PROP_OBJECT_IDENTIFIER, 1, val, true);
+            ret.WriteProperty(
+                new BacnetObjectId(
+                    BacnetObjectTypes.OBJECT_DEVICE,
+                    Serialize.ASN1.BACNET_MAX_INSTANCE), BacnetPropertyIds.PROP_OBJECT_IDENTIFIER, 1, val, true);
 
             return ret;
         }

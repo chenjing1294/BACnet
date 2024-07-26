@@ -31,6 +31,7 @@ public enum BacnetErrorCodes
     ERROR_CODE_NOT_COV_PROPERTY = 44,
     ERROR_CODE_OPTIONAL_FUNCTIONALITY_NOT_SUPPORTED = 45,
     ERROR_CODE_PROPERTY_IS_NOT_AN_ARRAY = 50,
+
     /* ERROR_CODE_READ_ACCESS_DENIED = 27, */
     ERROR_CODE_UNKNOWN_PROPERTY = 32,
     ERROR_CODE_VALUE_OUT_OF_RANGE = 37,
@@ -43,6 +44,7 @@ public enum BacnetErrorCodes
 
     /* Error Class - Security */
     ERROR_CODE_AUTHENTICATION_FAILED = 1,
+
     /* ERROR_CODE_CHARACTER_SET_NOT_SUPPORTED = 41, */
     ERROR_CODE_INCOMPATIBLE_SECURITY_LEVELS = 6,
     ERROR_CODE_INVALID_OPERATOR_NAME = 12,
@@ -64,6 +66,7 @@ public enum BacnetErrorCodes
     ERROR_CODE_INVALID_PARAMETER_DATA_TYPE = 13,
     ERROR_CODE_INVALID_TIME_STAMP = 14,
     ERROR_CODE_MISSING_REQUIRED_PARAMETER = 16,
+
     /* ERROR_CODE_OPTIONAL_FUNCTIONALITY_NOT_SUPPORTED = 45, */
     ERROR_CODE_PROPERTY_IS_NOT_A_LIST = 22,
     ERROR_CODE_SERVICE_REQUEST_DENIED = 29,
@@ -77,6 +80,7 @@ public enum BacnetErrorCodes
 
     /* unused */
     ERROR_CODE_RESERVED1 = 33,
+
     /* new error codes from new addenda */
     ERROR_CODE_ABORT_BUFFER_OVERFLOW = 51,
     ERROR_CODE_ABORT_INVALID_APDU_IN_THIS_STATE = 52,
@@ -235,6 +239,7 @@ public enum BacnetErrorCodes
     ERROR_CODE_REFERENCED_PORT_IN_ERROR = 205,
     MAX_BACNET_ERROR_CODE = 206,
     ERROR_CODE_RESERVED_MAX = 255,
+
     /* Enumerated values 0-255 are reserved for definition by ASHRAE. */
     /* Enumerated values 256-65535 may be used by others subject to */
     /* the procedures and constraints described in Clause 23. */

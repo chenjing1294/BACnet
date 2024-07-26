@@ -2,10 +2,10 @@ namespace System.IO.BACnet;
 
 public struct BacnetDate : ASN1.IEncode, ASN1.IDecode
 {
-    public byte year;     /* 255 any */
-    public byte month;      /* 1=Jan; 255 any, 13 Odd, 14 Even */
-    public byte day;        /* 1..31; 32 last day of the month; 255 any */
-    public byte wday;       /* 1=Monday-7=Sunday, 255 any */
+    public byte year; /* 255 any */
+    public byte month; /* 1=Jan; 255 any, 13 Odd, 14 Even */
+    public byte day; /* 1..31; 32 last day of the month; 255 any */
+    public byte wday; /* 1=Monday-7=Sunday, 255 any */
 
     public BacnetDate(byte year, byte month, byte day, byte wday = 255)
     {
@@ -53,10 +53,10 @@ public struct BacnetDate : ASN1.IEncode, ASN1.IDecode
         if (wday == 255)
             return true;
 
-        if (wday == 7 && date.DayOfWeek == 0)  // Sunday 7 for Bacnet, 0 for .NET
+        if (wday == 7 && date.DayOfWeek == 0) // Sunday 7 for Bacnet, 0 for .NET
             return true;
 
-        if (wday == (int)date.DayOfWeek)
+        if (wday == (int) date.DayOfWeek)
             return true;
 
         return false;

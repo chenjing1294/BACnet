@@ -1,32 +1,32 @@
 ﻿/**************************************************************************
-*                           MIT License
-* 
-* Copyright (C) 2015 Frederic Chaxel <fchaxel@free.fr>
-*
-* lot of code ported from https://github.com/LorenVS/bacstack
-*      Copyright (C) 2014 Loren Van Spronsen, thank to him.
-* Thank to Christopher Gunther for the idea, and the starting code
-* 
-* Permission is hereby granted, free of charge, to any person obtaining
-* a copy of this software and associated documentation files (the
-* "Software"), to deal in the Software without restriction, including
-* without limitation the rights to use, copy, modify, merge, publish,
-* distribute, sublicense, and/or sell copies of the Software, and to
-* permit persons to whom the Software is furnished to do so, subject to
-* the following conditions:
-*
-* The above copyright notice and this permission notice shall be included
-* in all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*
-*********************************************************************/
+ *                           MIT License
+ *
+ * Copyright (C) 2015 Frederic Chaxel <fchaxel@free.fr>
+ *
+ * lot of code ported from https://github.com/LorenVS/bacstack
+ *      Copyright (C) 2014 Loren Van Spronsen, thank to him.
+ * Thank to Christopher Gunther for the idea, and the starting code
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *********************************************************************/
 
 namespace System.IO.BACnet;
 
@@ -68,7 +68,7 @@ internal class BacnetEthernetProtocolTransport : BacnetTransportBase
         // filter to only bacnet packets
         _device.Filter = "ether proto 0x82";
 
-        var th = new Thread(CaptureThread) { IsBackground = true };
+        var th = new Thread(CaptureThread) {IsBackground = true};
         th.Start();
     }
 
@@ -85,8 +85,8 @@ internal class BacnetEthernetProtocolTransport : BacnetTransportBase
             buffer[hdrOffset++] = _deviceMac[i];
 
         // the next 2 bytes are used for the packet length
-        buffer[hdrOffset++] = (byte)(((dataLength + 3) & 0xFF00) >> 8);
-        buffer[hdrOffset++] = (byte)((dataLength + 3) & 0xFF);
+        buffer[hdrOffset++] = (byte) (((dataLength + 3) & 0xFF00) >> 8);
+        buffer[hdrOffset++] = (byte) ((dataLength + 3) & 0xFF);
 
         // DSAP and SSAP
         buffer[hdrOffset++] = 0x82;
@@ -131,6 +131,7 @@ internal class BacnetEthernetProtocolTransport : BacnetTransportBase
                 return null;
             }
         }
+
         foreach (var device in devices)
         {
             device.Open(DeviceMode.Normal, 1000); // 1000 ms read timeout

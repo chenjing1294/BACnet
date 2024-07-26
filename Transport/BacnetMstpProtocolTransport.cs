@@ -155,12 +155,13 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
             if (ev.WaitOne(timeout))
                 return false;
         }
+
         return true;
     }
 
     public override BacnetAddress GetBroadcastAddress()
     {
-        return new BacnetAddress(BacnetAddressTypes.MSTP, 0xFFFF, new byte[] { 0xFF });
+        return new BacnetAddress(BacnetAddressTypes.MSTP, 0xFFFF, new byte[] {0xFF});
     }
 
     public override void Dispose()
@@ -174,7 +175,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
     public override bool Equals(object obj)
     {
         if (obj is not BacnetMstpProtocolTransport) return false;
-        var a = (BacnetMstpProtocolTransport)obj;
+        var a = (BacnetMstpProtocolTransport) obj;
         return _port.Equals(a._port);
     }
 
@@ -206,16 +207,19 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
         if (frame.Data == null || frame.Data.Length == 0)
         {
             var tmpTransmitBuffer = new byte[MSTP.MSTP_HEADER_LENGTH];
-            tx = MSTP.Encode(tmpTransmitBuffer, 0, frame.FrameType, frame.DestinationAddress,
-                (byte)SourceAddress, 0);
+            tx = MSTP.Encode(
+                tmpTransmitBuffer, 0, frame.FrameType, frame.DestinationAddress,
+                (byte) SourceAddress, 0);
             _port.Write(tmpTransmitBuffer, 0, tx);
         }
         else
         {
-            tx = MSTP.Encode(frame.Data, 0, frame.FrameType, frame.DestinationAddress, (byte)SourceAddress,
+            tx = MSTP.Encode(
+                frame.Data, 0, frame.FrameType, frame.DestinationAddress, (byte) SourceAddress,
                 frame.DataLength);
             _port.Write(frame.Data, 0, tx);
         }
+
         frame.SendMutex.Set();
         Log.Debug($"{frame.FrameType} {frame.DestinationAddress:X2}");
     }
@@ -236,7 +240,8 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
             SendFrame(BacnetMstpFrameTypes.FRAME_TYPE_POLL_FOR_MASTER, _ps);
 
             //wait
-            var status = GetNextMessage(T_USAGE_TIMEOUT, out var frameType, out var destinationAddress,
+            var status = GetNextMessage(
+                T_USAGE_TIMEOUT, out var frameType, out var destinationAddress,
                 out var sourceAddress, out var msgLength);
 
             if (status == GetMessageStatus.Good)
@@ -248,7 +253,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                     {
                         _soleMaster = false;
                         _ns = sourceAddress;
-                        _ps = (byte)SourceAddress;
+                        _ps = (byte) SourceAddress;
                         _tokenCount = 0;
                         return StateChanges.ReceivedReplyToPFM;
                     }
@@ -260,21 +265,24 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                     RemoveCurrentMessage(msgLength);
                 }
             }
+
             if (_soleMaster)
             {
                 /* SoleMaster */
                 _frameCount = 0;
                 return StateChanges.SoleMaster;
             }
+
             if (_ns != SourceAddress)
             {
                 /* DoneWithPFM */
                 return StateChanges.DoneWithPFM;
             }
+
             if ((_ps + 1) % (MaxMaster + 1) != SourceAddress)
             {
                 /* SendNextPFM */
-                _ps = (byte)((_ps + 1) % (MaxMaster + 1));
+                _ps = (byte) ((_ps + 1) % (MaxMaster + 1));
             }
             else
             {
@@ -293,12 +301,14 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
             /* SendAnotherFrame */
             return StateChanges.SendAnotherFrame;
         }
+
         if (!_soleMaster && _ns == SourceAddress)
         {
             /* NextStationUnknown */
-            _ps = (byte)((SourceAddress + 1) % (MaxMaster + 1));
+            _ps = (byte) ((SourceAddress + 1) % (MaxMaster + 1));
             return StateChanges.NextStationUnknown;
         }
+
         if (_tokenCount < MaxPoll - 1)
         {
             _tokenCount++;
@@ -308,47 +318,52 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                 _frameCount = 0;
                 return StateChanges.SoleMaster;
             }
+
             /* SendToken */
             return StateChanges.SendToken;
         }
+
         if ((_ps + 1) % (MaxMaster + 1) == _ns)
         {
             if (!_soleMaster)
             {
                 /* ResetMaintenancePFM */
-                _ps = (byte)SourceAddress;
+                _ps = (byte) SourceAddress;
                 _tokenCount = 1;
                 return StateChanges.ResetMaintenancePFM;
             }
+
             /* SoleMasterRestartMaintenancePFM */
-            _ps = (byte)((_ns + 1) % (MaxMaster + 1));
-            _ns = (byte)SourceAddress;
+            _ps = (byte) ((_ns + 1) % (MaxMaster + 1));
+            _ns = (byte) SourceAddress;
             _tokenCount = 1;
             return StateChanges.SoleMasterRestartMaintenancePFM;
         }
+
         /* SendMaintenancePFM */
-        _ps = (byte)((_ps + 1) % (MaxMaster + 1));
+        _ps = (byte) ((_ps + 1) % (MaxMaster + 1));
         return StateChanges.SendMaintenancePFM;
     }
 
     private StateChanges WaitForReply()
     {
         //fetch message
-        var status = GetNextMessage(T_REPLY_TIMEOUT, out var frameType, out var destinationAddress,
+        var status = GetNextMessage(
+            T_REPLY_TIMEOUT, out var frameType, out var destinationAddress,
             out var sourceAddress, out var msgLength);
 
         if (status == GetMessageStatus.Good)
         {
             try
             {
-                if (destinationAddress == (byte)SourceAddress &&
+                if (destinationAddress == (byte) SourceAddress &&
                     (frameType == BacnetMstpFrameTypes.FRAME_TYPE_TEST_RESPONSE ||
                      frameType == BacnetMstpFrameTypes.FRAME_TYPE_BACNET_DATA_NOT_EXPECTING_REPLY))
                 {
                     //signal upper layer
                     if (frameType != BacnetMstpFrameTypes.FRAME_TYPE_TEST_RESPONSE)
                     {
-                        var remoteAddress = new BacnetAddress(BacnetAddressTypes.MSTP, 0, new[] { sourceAddress });
+                        var remoteAddress = new BacnetAddress(BacnetAddressTypes.MSTP, 0, new[] {sourceAddress});
                         try
                         {
                             InvokeMessageRecieved(_localBuffer, MSTP.MSTP_HEADER_LENGTH, msgLength, remoteAddress);
@@ -396,6 +411,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
             _frameCount = MaxInfoFrames;
             return StateChanges.NothingToSend;
         }
+
         /* SendNoWait / SendAndWait */
         MessageFrame messageFrame;
         lock (_sendQueue)
@@ -403,6 +419,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
             messageFrame = _sendQueue.First.Value;
             _sendQueue.RemoveFirst();
         }
+
         SendFrame(messageFrame);
         _frameCount++;
         if (messageFrame.FrameType == BacnetMstpFrameTypes.FRAME_TYPE_BACNET_DATA_EXPECTING_REPLY ||
@@ -425,8 +442,8 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
         }
 
         //give up
-        _ps = (byte)((_ns + 1) % (MaxMaster + 1));
-        _ns = (byte)SourceAddress;
+        _ps = (byte) ((_ns + 1) % (MaxMaster + 1));
+        _ns = (byte) SourceAddress;
         _tokenCount = 0;
         return StateChanges.FindNewSuccessor;
     }
@@ -438,7 +455,8 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
         while (_port != null)
         {
             //get message
-            var status = GetNextMessage(noTokenTimeout, out var frameType, out var destinationAddress,
+            var status = GetNextMessage(
+                noTokenTimeout, out var frameType, out var destinationAddress,
                 out var sourceAddress, out var msgLength);
 
             if (status == GetMessageStatus.Good)
@@ -451,14 +469,17 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                         {
                             case BacnetMstpFrameTypes.FRAME_TYPE_POLL_FOR_MASTER:
                                 if (destinationAddress == 0xFF)
-                                    QueueFrame(BacnetMstpFrameTypes.FRAME_TYPE_REPLY_TO_POLL_FOR_MASTER,
+                                    QueueFrame(
+                                        BacnetMstpFrameTypes.FRAME_TYPE_REPLY_TO_POLL_FOR_MASTER,
                                         sourceAddress);
                                 else
                                 {
                                     //respond to PFM
-                                    SendFrame(BacnetMstpFrameTypes.FRAME_TYPE_REPLY_TO_POLL_FOR_MASTER,
+                                    SendFrame(
+                                        BacnetMstpFrameTypes.FRAME_TYPE_REPLY_TO_POLL_FOR_MASTER,
                                         sourceAddress);
                                 }
+
                                 break;
                             case BacnetMstpFrameTypes.FRAME_TYPE_TOKEN:
                                 if (destinationAddress != 0xFF)
@@ -467,6 +488,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                                     _soleMaster = false;
                                     return StateChanges.ReceivedToken;
                                 }
+
                                 break;
                             case BacnetMstpFrameTypes.FRAME_TYPE_TEST_REQUEST:
                                 if (destinationAddress == 0xFF)
@@ -476,19 +498,21 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                                     //respond to test
                                     SendFrame(BacnetMstpFrameTypes.FRAME_TYPE_TEST_RESPONSE, sourceAddress);
                                 }
+
                                 break;
                             case BacnetMstpFrameTypes.FRAME_TYPE_BACNET_DATA_NOT_EXPECTING_REPLY:
                             case BacnetMstpFrameTypes.FRAME_TYPE_BACNET_DATA_EXPECTING_REPLY:
                                 try
                                 {
                                     //signal upper layer
-                                    var remoteAddress = new BacnetAddress(BacnetAddressTypes.MSTP, 0, new[] { sourceAddress });
+                                    var remoteAddress = new BacnetAddress(BacnetAddressTypes.MSTP, 0, new[] {sourceAddress});
                                     InvokeMessageRecieved(_localBuffer, MSTP.MSTP_HEADER_LENGTH, msgLength, remoteAddress);
                                 }
                                 catch (Exception ex)
                                 {
                                     Log.Error("Exception in MessageRecieved event", ex);
                                 }
+
                                 if (frameType == BacnetMstpFrameTypes.FRAME_TYPE_BACNET_DATA_EXPECTING_REPLY)
                                 {
                                     _replySource = sourceAddress;
@@ -496,6 +520,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                                     _replyMutex.Reset();
                                     return StateChanges.ReceivedDataNeedingReply;
                                 }
+
                                 break;
                         }
                     }
@@ -508,8 +533,8 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
             else if (status == GetMessageStatus.Timeout)
             {
                 /* GenerateToken */
-                _ps = (byte)((SourceAddress + 1) % (MaxMaster + 1));
-                _ns = (byte)SourceAddress;
+                _ps = (byte) ((SourceAddress + 1) % (MaxMaster + 1));
+                _ns = (byte) SourceAddress;
                 _tokenCount = 0;
                 return StateChanges.GenerateToken;
             }
@@ -539,6 +564,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                 _sendQueue.Remove(_reply);
             return StateChanges.Reply;
         }
+
         SendFrame(BacnetMstpFrameTypes.FRAME_TYPE_REPLY_POSTPONED, _replySource);
         return StateChanges.DeferredReply;
     }
@@ -548,8 +574,8 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
         _tokenCount = MaxPoll; /* cause a Poll For Master to be sent when this node first receives the token */
         _frameCount = 0;
         _soleMaster = false;
-        _ns = (byte)SourceAddress;
-        _ps = (byte)SourceAddress;
+        _ns = (byte) SourceAddress;
+        _ps = (byte) SourceAddress;
         return StateChanges.DoneInitializing;
     }
 
@@ -610,6 +636,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                         break;
                 }
             }
+
             Log.Debug("MSTP thread is closing down");
         }
         catch (Exception ex)
@@ -647,6 +674,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                 _localOffset = 1;
                 Log.Debug("Garbage");
             }
+
             return;
         }
 
@@ -687,6 +715,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                 RemoveGarbage();
                 return status;
             }
+
             if (rx < 0)
             {
                 //drop message
@@ -694,6 +723,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                 RemoveGarbage();
                 return GetMessageStatus.ConnectionError;
             }
+
             if (rx == 0)
             {
                 //drop message
@@ -701,6 +731,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                 RemoveGarbage();
                 return GetMessageStatus.ConnectionClose;
             }
+
             _localOffset += rx;
 
             //remove paddings & garbage
@@ -708,7 +739,8 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
         }
 
         //decode
-        if (MSTP.Decode(_localBuffer, 0, _localOffset, out frameType, out destinationAddress,
+        if (MSTP.Decode(
+                _localBuffer, 0, _localOffset, out frameType, out destinationAddress,
                 out sourceAddress, out msgLength) < 0)
         {
             //drop message
@@ -743,6 +775,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                     RemoveGarbage();
                     return status;
                 }
+
                 if (rx < 0)
                 {
                     //drop message
@@ -750,6 +783,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                     RemoveGarbage();
                     return GetMessageStatus.ConnectionError;
                 }
+
                 if (rx == 0)
                 {
                     //drop message
@@ -757,12 +791,14 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                     RemoveGarbage();
                     return GetMessageStatus.ConnectionClose;
                 }
+
                 _localOffset += rx;
             }
 
             //verify data crc
             if (
-                MSTP.Decode(_localBuffer, 0, _localOffset, out frameType, out destinationAddress,
+                MSTP.Decode(
+                    _localBuffer, 0, _localOffset, out frameType, out destinationAddress,
                     out sourceAddress, out msgLength) < 0)
             {
                 //drop message
@@ -866,7 +902,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
         if (_port == null) return;
         _port.Open();
 
-        var th = new Thread(MstpThreadSniffer) { IsBackground = true };
+        var th = new Thread(MstpThreadSniffer) {IsBackground = true};
         th.Start();
     }
 
@@ -902,6 +938,7 @@ public class BacnetMstpProtocolTransport : BacnetTransportBase
                             // frames task list will grow infinitly
                             RawMessageRecieved(packet, 0, length);
                         }
+
                         RemoveCurrentMessage(msgLength);
                         break;
                 }

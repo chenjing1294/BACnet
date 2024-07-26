@@ -18,7 +18,7 @@
     <PackageIcon>logo.png</PackageIcon>
     <PackageIconUrl>https://raw.githubusercontent.com/ela-compil/BACnet/master/logo.png</PackageIconUrl>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <None Include="logo.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>

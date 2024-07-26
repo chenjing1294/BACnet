@@ -6,7 +6,7 @@ public class Services
     {
         ASN1.encode_application_object_id(buffer, BacnetObjectTypes.OBJECT_DEVICE, deviceId);
         ASN1.encode_application_unsigned(buffer, maxApdu);
-        ASN1.encode_application_enumerated(buffer, (uint)segmentation);
+        ASN1.encode_application_enumerated(buffer, (uint) segmentation);
         ASN1.encode_application_unsigned(buffer, vendorId);
     }
 
@@ -24,7 +24,7 @@ public class Services
         /* OBJECT ID - object id */
         var len = ASN1.decode_tag_number_and_value(buffer, offset + apduLen, out var tagNumber, out var lenValue);
         apduLen += len;
-        if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_ID)
+        if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_ID)
             return -1;
         len = ASN1.decode_object_id(buffer, offset + apduLen, out objectId.type, out objectId.instance);
         apduLen += len;
@@ -35,7 +35,7 @@ public class Services
         len =
             ASN1.decode_tag_number_and_value(buffer, offset + apduLen, out tagNumber, out lenValue);
         apduLen += len;
-        if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT)
+        if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT)
             return -1;
         len = ASN1.decode_unsigned(buffer, offset + apduLen, lenValue, out var decodedValue);
         apduLen += len;
@@ -44,23 +44,23 @@ public class Services
         len =
             ASN1.decode_tag_number_and_value(buffer, offset + apduLen, out tagNumber, out lenValue);
         apduLen += len;
-        if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_ENUMERATED)
+        if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_ENUMERATED)
             return -1;
         len = ASN1.decode_enumerated(buffer, offset + apduLen, lenValue, out decodedValue);
         apduLen += len;
-        if (decodedValue > (uint)BacnetSegmentations.SEGMENTATION_NONE)
+        if (decodedValue > (uint) BacnetSegmentations.SEGMENTATION_NONE)
             return -1;
-        segmentation = (BacnetSegmentations)decodedValue;
+        segmentation = (BacnetSegmentations) decodedValue;
         /* Vendor ID - unsigned16 */
         len =
             ASN1.decode_tag_number_and_value(buffer, offset + apduLen, out tagNumber, out lenValue);
         apduLen += len;
-        if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT)
+        if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT)
             return -1;
         ASN1.decode_unsigned(buffer, offset + apduLen, lenValue, out decodedValue);
         if (decodedValue > 0xFFFF)
             return -1;
-        vendorId = (ushort)decodedValue;
+        vendorId = (ushort) decodedValue;
 
         return offset - orgOffset;
     }
@@ -80,9 +80,10 @@ public class Services
         /* optional limits - must be used as a pair */
         if (lowLimit >= 0 && lowLimit <= ASN1.BACNET_MAX_INSTANCE && highLimit >= 0 && highLimit <= ASN1.BACNET_MAX_INSTANCE)
         {
-            ASN1.encode_context_unsigned(buffer, 0, (uint)lowLimit);
-            ASN1.encode_context_unsigned(buffer, 1, (uint)highLimit);
+            ASN1.encode_context_unsigned(buffer, 0, (uint) lowLimit);
+            ASN1.encode_context_unsigned(buffer, 1, (uint) highLimit);
         }
+
         if (objectId != null)
         {
             ASN1.encode_context_object_id(buffer, 2, objectId.Value.type, objectId.Value.instance);
@@ -99,8 +100,8 @@ public class Services
         if (lowLimit >= 0 && lowLimit <= ASN1.BACNET_MAX_INSTANCE &&
             highLimit >= 0 && highLimit <= ASN1.BACNET_MAX_INSTANCE)
         {
-            ASN1.encode_context_unsigned(buffer, 0, (uint)lowLimit);
-            ASN1.encode_context_unsigned(buffer, 1, (uint)highLimit);
+            ASN1.encode_context_unsigned(buffer, 0, (uint) lowLimit);
+            ASN1.encode_context_unsigned(buffer, 1, (uint) highLimit);
         }
     }
 
@@ -121,7 +122,7 @@ public class Services
         {
             len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out var decodedValue);
             if (decodedValue <= ASN1.BACNET_MAX_INSTANCE)
-                lowLimit = (int)decodedValue;
+                lowLimit = (int) decodedValue;
             if (apduLen > len)
             {
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
@@ -131,7 +132,7 @@ public class Services
                 {
                     len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out decodedValue);
                     if (decodedValue <= ASN1.BACNET_MAX_INSTANCE)
-                        highLimit = (int)decodedValue;
+                        highLimit = (int) decodedValue;
                 }
                 else
                     return -1;
@@ -162,7 +163,7 @@ public class Services
         {
             len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out decodedValue);
             if (decodedValue <= ASN1.BACNET_MAX_INSTANCE)
-                lowLimit = (int)decodedValue;
+                lowLimit = (int) decodedValue;
             len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
         }
 
@@ -170,14 +171,14 @@ public class Services
         {
             len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out decodedValue);
             if (decodedValue <= ASN1.BACNET_MAX_INSTANCE)
-                highLimit = (int)decodedValue;
+                highLimit = (int) decodedValue;
             len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
         }
 
         if (tagNumber == 2)
         {
             len += ASN1.decode_object_id(buffer, offset + len, out ushort objType, out var objInst);
-            objId = new BacnetObjectId((BacnetObjectTypes)objType, objInst);
+            objId = new BacnetObjectId((BacnetObjectTypes) objType, objInst);
         }
 
         if (tagNumber == 3)
@@ -195,6 +196,7 @@ public class Services
         ASN1.encode_context_character_string(buffer, 4, ackSource);
         ASN1.bacapp_encode_context_timestamp(buffer, 5, ackTimeStamp);
     }
+
     // DAL
     public static int DecodeAlarmAcknowledge(byte[] buffer, int offset, int apduLen, out uint ackProcessIdentifier, out BacnetObjectId eventObjectIdentifier, out uint eventStateAcked, out string ackSource, out BacnetGenericTime eventTimeStamp, out BacnetGenericTime ackTimeStamp)
     {
@@ -204,39 +206,43 @@ public class Services
         var len = 0;
         len += ASN1.decode_context_unsigned(buffer, offset + len, 0, out ackProcessIdentifier);
         len += ASN1.decode_context_object_id(buffer, offset + len, 1, out ushort type, out eventObjectIdentifier.instance);
-        eventObjectIdentifier.type = (BacnetObjectTypes)type;
+        eventObjectIdentifier.type = (BacnetObjectTypes) type;
         len += ASN1.decode_context_enumerated(buffer, offset + len, 2, out eventStateAcked);
         if (ASN1.decode_is_context_tag(buffer, offset + len, 3))
         {
             len += 2; // opening Tag 3 then 2
             len += ASN1.decode_application_date(buffer, offset + len, out var date);
             len += ASN1.decode_application_time(buffer, offset + len, out var time);
-            eventTimeStamp.Time = new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute,
+            eventTimeStamp.Time = new DateTime(
+                date.Year, date.Month, date.Day, time.Hour, time.Minute,
                 time.Second, time.Millisecond);
 
             len += 2; // closing tag 2 then 3
         }
         else
             return -1;
+
         len += ASN1.decode_context_character_string(buffer, offset + len, 256, 4, out ackSource);
         if (ASN1.decode_is_context_tag(buffer, offset + len, 5))
         {
             len += 2; // opening Tag 5 then 2
             len += ASN1.decode_application_date(buffer, offset + len, out var date);
             len += ASN1.decode_application_time(buffer, offset + len, out var time);
-            ackTimeStamp.Time = new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute,
+            ackTimeStamp.Time = new DateTime(
+                date.Year, date.Month, date.Day, time.Hour, time.Minute,
                 time.Second, time.Millisecond);
             len += 2; // closing tag 2 then 5
         }
         else
             return -1;
+
         return len;
     }
 
     public static void EncodeAtomicReadFile(EncodeBuffer buffer, bool isStream, BacnetObjectId objectId, int position, uint count)
     {
         ASN1.encode_application_object_id(buffer, objectId.type, objectId.instance);
-        var tagNumber = (byte)(isStream ? 0 : 1);
+        var tagNumber = (byte) (isStream ? 0 : 1);
         ASN1.encode_opening_tag(buffer, tagNumber);
         ASN1.encode_application_signed(buffer, position);
         ASN1.encode_application_unsigned(buffer, count);
@@ -254,7 +260,7 @@ public class Services
         count = 0;
 
         len = ASN1.decode_tag_number_and_value(buffer, offset + len, out var tagNumber, out var lenValueType);
-        if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_ID)
+        if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_ID)
             return -1;
         len += ASN1.decode_object_id(buffer, offset + len, out objectId.type, out objectId.instance);
         if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
@@ -264,13 +270,13 @@ public class Services
             /* fileStartPosition */
             tagLen = ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
             len += tagLen;
-            if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT)
+            if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT)
                 return -1;
             len += ASN1.decode_signed(buffer, offset + len, lenValueType, out position);
             /* requestedOctetCount */
             tagLen = ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
             len += tagLen;
-            if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT)
+            if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT)
                 return -1;
             len += ASN1.decode_unsigned(buffer, offset + len, lenValueType, out count);
             if (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 0))
@@ -285,16 +291,17 @@ public class Services
             len++;
             /* fileStartRecord */
             tagLen =
-                ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber,
-                out lenValueType);
+                ASN1.decode_tag_number_and_value(
+                    buffer, offset + len, out tagNumber,
+                    out lenValueType);
             len += tagLen;
-            if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT)
+            if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT)
                 return -1;
             len += ASN1.decode_signed(buffer, offset + len, lenValueType, out position);
             /* RecordCount */
             tagLen = ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
             len += tagLen;
-            if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT)
+            if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT)
                 return -1;
             len += ASN1.decode_unsigned(buffer, offset + len, lenValueType, out count);
             if (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 1))
@@ -311,7 +318,7 @@ public class Services
     public static void EncodeAtomicReadFileAcknowledge(EncodeBuffer buffer, bool isStream, bool endOfFile, int position, uint blockCount, byte[][] blocks, int[] counts)
     {
         ASN1.encode_application_boolean(buffer, endOfFile);
-        var tagNumber = (byte)(isStream ? 0 : 1);
+        var tagNumber = (byte) (isStream ? 0 : 1);
         ASN1.encode_opening_tag(buffer, tagNumber);
         ASN1.encode_application_signed(buffer, position);
 
@@ -332,7 +339,7 @@ public class Services
     public static void EncodeAtomicWriteFile(EncodeBuffer buffer, bool isStream, BacnetObjectId objectId, int position, uint blockCount, byte[][] blocks, int[] counts)
     {
         ASN1.encode_application_object_id(buffer, objectId.type, objectId.instance);
-        var tagNumber = (byte)(isStream ? 0 : 1);
+        var tagNumber = (byte) (isStream ? 0 : 1);
 
         ASN1.encode_opening_tag(buffer, tagNumber);
         ASN1.encode_application_signed(buffer, position);
@@ -364,7 +371,7 @@ public class Services
         counts = null;
 
         len = ASN1.decode_tag_number_and_value(buffer, offset + len, out var tagNumber, out var lenValueType);
-        if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_ID)
+        if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_OBJECT_ID)
             return -1;
         len += ASN1.decode_object_id(buffer, offset + len, out objectId.type, out objectId.instance);
         if (ASN1.decode_is_opening_tag_number(buffer, offset + len, 0))
@@ -374,18 +381,18 @@ public class Services
             /* fileStartPosition */
             tagLen = ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
             len += tagLen;
-            if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT)
+            if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT)
                 return -1;
             len += ASN1.decode_signed(buffer, offset + len, lenValueType, out position);
             /* fileData */
             tagLen = ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
             len += tagLen;
-            if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_OCTET_STRING)
+            if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_OCTET_STRING)
                 return -1;
             blockCount = 1;
             blocks = new byte[1][];
             blocks[0] = new byte[lenValueType];
-            counts = new[] { (int)lenValueType };
+            counts = new[] {(int) lenValueType};
             len += ASN1.decode_octet_string(buffer, offset + len, apduLen, blocks[0], 0, lenValueType);
             if (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 0))
                 return -1;
@@ -400,13 +407,13 @@ public class Services
             /* fileStartRecord */
             tagLen = ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
             len += tagLen;
-            if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT)
+            if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT)
                 return -1;
             len += ASN1.decode_signed(buffer, offset + len, lenValueType, out position);
             /* returnedRecordCount */
             tagLen = ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
             len += tagLen;
-            if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT)
+            if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_UNSIGNED_INT)
                 return -1;
             len += ASN1.decode_unsigned(buffer, offset + len, lenValueType, out blockCount);
             /* fileData */
@@ -417,11 +424,12 @@ public class Services
                 tagLen = ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
                 len += tagLen;
                 blocks[i] = new byte[lenValueType];
-                counts[i] = (int)lenValueType;
-                if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_OCTET_STRING)
+                counts[i] = (int) lenValueType;
+                if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_OCTET_STRING)
                     return -1;
                 len += ASN1.decode_octet_string(buffer, offset + len, apduLen, blocks[i], 0, lenValueType);
             }
+
             if (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 1))
                 return -1;
             /* a tag number is not extended so only one octet */
@@ -458,6 +466,7 @@ public class Services
             {
                 ASN1.bacapp_encode_application_data(buffer, value);
             }
+
             ASN1.encode_closing_tag(buffer, 2);
 
             if (pValue.priority != ASN1.BACNET_NO_PRIORITY)
@@ -488,7 +497,7 @@ public class Services
 
     public static void EncodeAtomicWriteFileAcknowledge(EncodeBuffer buffer, bool isStream, int position)
     {
-        ASN1.encode_context_signed(buffer, (byte)(isStream ? 0 : 1), position);
+        ASN1.encode_context_signed(buffer, (byte) (isStream ? 0 : 1), position);
     }
 
     public static void EncodeCOVNotifyConfirmed(EncodeBuffer buffer, uint subscriberProcessIdentifier, uint initiatingDeviceIdentifier, BacnetObjectId monitoredObjectIdentifier, uint timeRemaining, IEnumerable<BacnetPropertyValue> values)
@@ -512,6 +521,7 @@ public class Services
             {
                 ASN1.encode_context_unsigned(buffer, 1, value.property.propertyArrayIndex);
             }
+
             /* tag 2 - value */
             /* abstract syntax gets enclosed in a context tag */
             ASN1.encode_opening_tag(buffer, 2);
@@ -519,6 +529,7 @@ public class Services
             {
                 ASN1.bacapp_encode_application_data(buffer, v);
             }
+
             ASN1.encode_closing_tag(buffer, 2);
             /* tag 3 - priority OPTIONAL */
             if (value.priority != ASN1.BACNET_NO_PRIORITY)
@@ -528,6 +539,7 @@ public class Services
             /* is there another one to encode? */
             /* FIXME: check to see if there is room in the APDU */
         }
+
         ASN1.encode_closing_tag(buffer, 4);
     }
 
@@ -552,6 +564,7 @@ public class Services
             {
                 ASN1.encode_context_unsigned(buffer, 1, value.property.propertyArrayIndex);
             }
+
             /* tag 2 - value */
             /* abstract syntax gets enclosed in a context tag */
             ASN1.encode_opening_tag(buffer, 2);
@@ -559,6 +572,7 @@ public class Services
             {
                 ASN1.bacapp_encode_application_data(buffer, v);
             }
+
             ASN1.encode_closing_tag(buffer, 2);
             /* tag 3 - priority OPTIONAL */
             if (value.priority != ASN1.BACNET_NO_PRIORITY)
@@ -568,6 +582,7 @@ public class Services
             /* is there another one to encode? */
             /* FIXME: check to see if there is room in the APDU */
         }
+
         ASN1.encode_closing_tag(buffer, 4);
     }
 
@@ -609,6 +624,7 @@ public class Services
         }
         else
             return -1;
+
         /* tag 1 - monitoredObjectIdentifier */
         if (ASN1.decode_is_context_tag(buffer, offset + len, 1))
         {
@@ -617,6 +633,7 @@ public class Services
         }
         else
             return -1;
+
         /* optional parameters - if missing, means cancellation */
         if (len < apduLen)
         {
@@ -625,12 +642,13 @@ public class Services
             {
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out lenValue);
                 issueConfirmedNotifications = buffer[offset + len] > 0;
-                len += (int)lenValue;
+                len += (int) lenValue;
             }
             else
             {
                 cancellationRequest = true;
             }
+
             /* tag 3 - lifetime - optional */
             if (ASN1.decode_is_context_tag(buffer, offset + len, 3))
             {
@@ -663,6 +681,7 @@ public class Services
             /* tag 3 - lifetime */
             ASN1.encode_context_unsigned(buffer, 3, lifetime);
         }
+
         /* tag 4 - monitoredPropertyIdentifier */
         ASN1.encode_opening_tag(buffer, 4);
         ASN1.encode_context_enumerated(buffer, 0, monitoredProperty.propertyIdentifier);
@@ -670,6 +689,7 @@ public class Services
         {
             ASN1.encode_context_unsigned(buffer, 1, monitoredProperty.propertyArrayIndex);
         }
+
         ASN1.encode_closing_tag(buffer, 4);
 
         /* tag 5 - covIncrement */
@@ -800,7 +820,8 @@ public class Services
         if (ASN1.decode_is_context_tag(buffer, offset + len, 1))
         {
             len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out lenValue);
-            len += ASN1.decode_object_id(buffer, offset + len, out eventData.initiatingObjectIdentifier.type,
+            len += ASN1.decode_object_id(
+                buffer, offset + len, out eventData.initiatingObjectIdentifier.type,
                 out eventData.initiatingObjectIdentifier.instance);
         }
         else
@@ -810,7 +831,8 @@ public class Services
         if (ASN1.decode_is_context_tag(buffer, offset + len, 2))
         {
             len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out lenValue);
-            len += ASN1.decode_object_id(buffer, offset + len, out eventData.eventObjectIdentifier.type,
+            len += ASN1.decode_object_id(
+                buffer, offset + len, out eventData.eventObjectIdentifier.type,
                 out eventData.eventObjectIdentifier.instance);
         }
         else
@@ -822,7 +844,8 @@ public class Services
             len += 2; // opening Tag 3 then 2
             len += ASN1.decode_application_date(buffer, offset + len, out var date);
             len += ASN1.decode_application_time(buffer, offset + len, out var time);
-            eventData.timeStamp.Time = new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute,
+            eventData.timeStamp.Time = new DateTime(
+                date.Year, date.Month, date.Day, time.Hour, time.Minute,
                 time.Second, time.Millisecond);
 
             len += 2; // closing tag 2 then 3
@@ -845,7 +868,7 @@ public class Services
             len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out lenValue);
             len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out var priority);
             if (priority > 0xFF) return -1;
-            eventData.priority = (byte)priority;
+            eventData.priority = (byte) priority;
         }
         else
             return -1;
@@ -913,7 +936,7 @@ public class Services
                     return -1;
 
                 len += ASN1.decode_tag_number(buffer, offset + len, out _);
-                if (!ASN1.decode_is_opening_tag_number(buffer, offset + len, (byte)eventData.eventType))
+                if (!ASN1.decode_is_opening_tag_number(buffer, offset + len, (byte) eventData.eventType))
                     return -1;
 
                 len += ASN1.decode_tag_number(buffer, offset + len, out _);
@@ -934,12 +957,12 @@ public class Services
                             return -1;
 
                         len++;
-                        if (ASN1.decode_is_context_tag(buffer, offset + len, (byte)BacnetCOVTypes.CHANGE_OF_VALUE_BITS))
+                        if (ASN1.decode_is_context_tag(buffer, offset + len, (byte) BacnetCOVTypes.CHANGE_OF_VALUE_BITS))
                         {
                             len += ASN1.decode_context_bitstring(buffer, offset + len, 0, out eventData.changeOfValue_changedBits);
                             eventData.changeOfValue_tag = BacnetCOVTypes.CHANGE_OF_VALUE_BITS;
                         }
-                        else if (ASN1.decode_is_context_tag(buffer, offset + len, (byte)BacnetCOVTypes.CHANGE_OF_VALUE_REAL))
+                        else if (ASN1.decode_is_context_tag(buffer, offset + len, (byte) BacnetCOVTypes.CHANGE_OF_VALUE_REAL))
                         {
                             len += ASN1.decode_context_real(buffer, offset + len, 1, out eventData.changeOfValue_changeValue);
                             eventData.changeOfValue_tag = BacnetCOVTypes.CHANGE_OF_VALUE_REAL;
@@ -972,7 +995,7 @@ public class Services
 
                         if (!ASN1.decode_is_opening_tag_number(buffer, offset + len, 2))
                             return -1;
-                        
+
                         len++;
                         len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out lenValue);
                         len += ASN1.decode_enumerated(buffer, offset + len, lenValue, out eventData.commandFailure_feedbackValue);
@@ -1030,7 +1053,7 @@ public class Services
 
                             len += ASN1.decode_tag_number_and_value(buffer, offset + len, out var tagNumber, out lenValue);
 
-                            switch ((BacnetApplicationTags)tagNumber)
+                            switch ((BacnetApplicationTags) tagNumber)
                             {
                                 case BacnetApplicationTags.BACNET_APPLICATION_TAG_ENUMERATED:
                                     len += ASN1.decode_enumerated(buffer, offset + len, lenValue, out var enumeratedValue);
@@ -1078,10 +1101,11 @@ public class Services
 
                                 // add new object property
                                 Array.Resize(ref eventData.changeOfReliability_propertyValues, currentIndex + 1);
-                                
+
                                 // read property identifier
-                                len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out var valueLength);                            
-                                len += ASN1.decode_enumerated(buffer, offset + len, valueLength,
+                                len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out var valueLength);
+                                len += ASN1.decode_enumerated(
+                                    buffer, offset + len, valueLength,
                                     out eventData.changeOfReliability_propertyValues[currentIndex].property.propertyIdentifier);
 
                                 // read property values
@@ -1099,18 +1123,21 @@ public class Services
                                             values.Add(value);
                                         }
                                     }
+
                                     len += ASN1.decode_tag_number(buffer, offset + len, out _);
                                 }
                             }
+
                             len += ASN1.decode_tag_number(buffer, offset + len, out _);
                         }
+
                         break;
 
                     default:
                         return -1;
                 }
 
-                if (!ASN1.decode_is_closing_tag_number(buffer, offset + len, (byte)eventData.eventType))
+                if (!ASN1.decode_is_closing_tag_number(buffer, offset + len, (byte) eventData.eventType))
                     return -1;
 
                 len += ASN1.decode_tag_number(buffer, offset + len, out _);
@@ -1144,14 +1171,14 @@ public class Services
         ASN1.encode_context_unsigned(buffer, 5, data.priority);
 
         /* tag 6 - eventType */
-        ASN1.encode_context_enumerated(buffer, 6, (uint)data.eventType);
+        ASN1.encode_context_enumerated(buffer, 6, (uint) data.eventType);
 
         /* tag 7 - messageText */
         if (!string.IsNullOrEmpty(data.messageText))
             ASN1.encode_context_character_string(buffer, 7, data.messageText);
 
         /* tag 8 - notifyType */
-        ASN1.encode_context_enumerated(buffer, 8, (uint)data.notifyType);
+        ASN1.encode_context_enumerated(buffer, 8, (uint) data.notifyType);
 
         switch (data.notifyType)
         {
@@ -1161,12 +1188,12 @@ public class Services
                 ASN1.encode_context_boolean(buffer, 9, data.ackRequired);
 
                 /* tag 10 - fromState */
-                ASN1.encode_context_enumerated(buffer, 10, (uint)data.fromState);
+                ASN1.encode_context_enumerated(buffer, 10, (uint) data.fromState);
                 break;
         }
 
         /* tag 11 - toState */
-        ASN1.encode_context_enumerated(buffer, 11, (uint)data.toState);
+        ASN1.encode_context_enumerated(buffer, 11, (uint) data.toState);
 
         switch (data.notifyType)
         {
@@ -1236,10 +1263,10 @@ public class Services
 
                     case BacnetEventTypes.EVENT_CHANGE_OF_LIFE_SAFETY:
                         ASN1.encode_opening_tag(buffer, 8);
-                        ASN1.encode_context_enumerated(buffer, 0, (uint)data.changeOfLifeSafety_newState);
-                        ASN1.encode_context_enumerated(buffer, 1, (uint)data.changeOfLifeSafety_newMode);
+                        ASN1.encode_context_enumerated(buffer, 0, (uint) data.changeOfLifeSafety_newState);
+                        ASN1.encode_context_enumerated(buffer, 1, (uint) data.changeOfLifeSafety_newMode);
                         ASN1.encode_context_bitstring(buffer, 2, data.changeOfLifeSafety_statusFlags);
-                        ASN1.encode_context_enumerated(buffer, 3, (uint)data.changeOfLifeSafety_operationExpected);
+                        ASN1.encode_context_enumerated(buffer, 3, (uint) data.changeOfLifeSafety_operationExpected);
                         ASN1.encode_closing_tag(buffer, 8);
                         break;
 
@@ -1263,6 +1290,7 @@ public class Services
                     default:
                         throw new NotImplementedException();
                 }
+
                 ASN1.encode_closing_tag(buffer, 12);
                 break;
 
@@ -1295,10 +1323,11 @@ public class Services
     // FChaxel
     public static int DecodeAlarmSummaryOrEvent(byte[] buffer, int offset, int apduLen, bool getEvent, ref IList<BacnetGetEventInformationData> alarms, out bool moreEvent)
     {
-        var len = 0; ;
+        var len = 0;
+        ;
 
         if (getEvent)
-            len++;  // peut être tag 0
+            len++; // peut être tag 0
 
         while (apduLen - 3 - len > 0)
         {
@@ -1313,14 +1342,14 @@ public class Services
 
             if (getEvent)
             {
-                len++;  // opening Tag 3
+                len++; // opening Tag 3
                 value.eventTimeStamps = new BacnetGenericTime[3];
 
                 for (var i = 0; i < 3; i++)
                 {
                     len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue); // opening tag
 
-                    if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_NULL)
+                    if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_NULL)
                     {
                         len += ASN1.decode_application_date(buffer, offset + len, out var date);
                         len += ASN1.decode_application_time(buffer, offset + len, out var time);
@@ -1329,10 +1358,10 @@ public class Services
                         len++; // closing tag
                     }
                     else
-                        len += (int)lenValue;
+                        len += (int) lenValue;
                 }
 
-                len++;  // closing Tag 3
+                len++; // closing Tag 3
 
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
                 len += ASN1.decode_enumerated(buffer, offset + len, lenValue, out value.notifyType);
@@ -1346,7 +1375,8 @@ public class Services
                     len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
                     len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out value.eventPriorities[i]);
                 }
-                len++;  // closing Tag 6
+
+                len++; // closing Tag 6
             }
 
             alarms.Add(value);
@@ -1359,6 +1389,7 @@ public class Services
 
         return len;
     }
+
     // DAL
     public static int DecodeAlarmSummaryOrEventRequest(byte[] buffer, int offset, int apduLen, bool getEvent, ref BacnetObjectId id)
     {
@@ -1369,6 +1400,7 @@ public class Services
             len++; // past opening tag 0
             len += ASN1.decode_object_id(buffer, offset + len, out id.type, out id.instance);
         }
+
         return len;
     }
 
@@ -1389,7 +1421,7 @@ public class Services
             /* Tag 0: objectIdentifier */
             ASN1.encode_context_object_id(buffer, 0, eventData.objectIdentifier.type, eventData.objectIdentifier.instance);
             /* Tag 1: eventState */
-            ASN1.encode_context_enumerated(buffer, 1, (uint)eventData.eventState);
+            ASN1.encode_context_enumerated(buffer, 1, (uint) eventData.eventState);
             /* Tag 2: acknowledgedTransitions */
             ASN1.encode_context_bitstring(buffer, 2, eventData.acknowledgedTransitions);
             /* Tag 3: eventTimeStamps */
@@ -1398,9 +1430,10 @@ public class Services
             {
                 ASN1.bacapp_encode_timestamp(buffer, eventData.eventTimeStamps[i]);
             }
+
             ASN1.encode_closing_tag(buffer, 3);
             /* Tag 4: notifyType */
-            ASN1.encode_context_enumerated(buffer, 4, (uint)eventData.notifyType);
+            ASN1.encode_context_enumerated(buffer, 4, (uint) eventData.notifyType);
             /* Tag 5: eventEnable */
             ASN1.encode_context_bitstring(buffer, 5, eventData.eventEnable);
             /* Tag 6: eventPriorities */
@@ -1409,8 +1442,10 @@ public class Services
             {
                 ASN1.encode_application_unsigned(buffer, eventData.eventPriorities[i]);
             }
+
             ASN1.encode_closing_tag(buffer, 6);
         }
+
         ASN1.encode_closing_tag(buffer, 0);
         ASN1.encode_context_boolean(buffer, 1, moreEvents);
     }
@@ -1509,7 +1544,7 @@ public class Services
 
     public static void EncodeReinitializeDevice(EncodeBuffer buffer, BacnetReinitializedStates state, string password)
     {
-        ASN1.encode_context_enumerated(buffer, 0, (uint)state);
+        ASN1.encode_context_enumerated(buffer, 0, (uint) state);
 
         /* optional password */
         if (!string.IsNullOrEmpty(password))
@@ -1579,7 +1614,7 @@ public class Services
                 ASN1.encode_closing_tag(buffer, 7);
                 break;
 
-            case BacnetReadRangeRequestTypes.RR_READ_ALL:  /* to attempt a read of the whole array or list, omit the range parameter */
+            case BacnetReadRangeRequestTypes.RR_READ_ALL: /* to attempt a read of the whole array or list, omit the range parameter */
                 break;
         }
     }
@@ -1600,7 +1635,7 @@ public class Services
             return -1;
         len++;
         len += ASN1.decode_object_id(buffer, offset + len, out ushort type, out objectId.instance);
-        objectId.type = (BacnetObjectTypes)type;
+        objectId.type = (BacnetObjectTypes) type;
         /* Tag 1: Property ID */
         len +=
             ASN1.decode_tag_number_and_value(buffer, offset + len, out var tagNumber, out var lenValueType);
@@ -1620,7 +1655,7 @@ public class Services
         /* optional request type */
         if (len < apduLen)
         {
-            len += ASN1.decode_tag_number(buffer, offset + len, out tagNumber);    //opening tag
+            len += ASN1.decode_tag_number(buffer, offset + len, out tagNumber); //opening tag
             switch (tagNumber)
             {
                 case 3:
@@ -1649,10 +1684,12 @@ public class Services
                     break;
 
                 default:
-                    return -1;  //don't know this type yet
+                    return -1; //don't know this type yet
             }
-            len += ASN1.decode_tag_number(buffer, offset + len, out tagNumber);    //closing tag
+
+            len += ASN1.decode_tag_number(buffer, offset + len, out tagNumber); //closing tag
         }
+
         return len;
     }
 
@@ -1666,6 +1703,7 @@ public class Services
         {
             ASN1.encode_context_unsigned(buffer, 2, arrayIndex);
         }
+
         /* Context 3 BACnet Result Flags */
         ASN1.encode_context_bitstring(buffer, 3, resultFlags);
         /* Context 4 Item Count */
@@ -1678,6 +1716,7 @@ public class Services
         {
             buffer.Add(applicationData, applicationData.Length);
         }
+
         ASN1.encode_closing_tag(buffer, 5);
 
         if (itemCount != 0 && requestType != BacnetReadRangeRequestTypes.RR_BY_POSITION && requestType != BacnetReadRangeRequestTypes.RR_READ_ALL)
@@ -1731,18 +1770,20 @@ public class Services
 
     public static void EncodeReadProperty(EncodeBuffer buffer, BacnetObjectId objectId, uint propertyId, uint arrayIndex = ASN1.BACNET_ARRAY_ALL)
     {
-        if ((int)objectId.type <= ASN1.BACNET_MAX_OBJECT)
+        if ((int) objectId.type <= ASN1.BACNET_MAX_OBJECT)
         {
             /* check bounds so that we could create malformed
                messages for testing */
             ASN1.encode_context_object_id(buffer, 0, objectId.type, objectId.instance);
         }
-        if (propertyId <= (uint)BacnetPropertyIds.MAX_BACNET_PROPERTY_ID)
+
+        if (propertyId <= (uint) BacnetPropertyIds.MAX_BACNET_PROPERTY_ID)
         {
             /* check bounds so that we could create malformed
                messages for testing */
             ASN1.encode_context_enumerated(buffer, 1, propertyId);
         }
+
         /* optional array index */
         if (arrayIndex != ASN1.BACNET_ARRAY_ALL)
         {
@@ -1788,7 +1829,7 @@ public class Services
         targetOffset = -1;
 
         len = ASN1.decode_tag_number_and_value(buffer, offset + len, out var tagNumber, out var lenValueType);
-        if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_BOOLEAN)
+        if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_BOOLEAN)
             return -1;
 
         endOfFile = lenValueType > 0;
@@ -1800,19 +1841,19 @@ public class Services
             /* fileStartPosition */
             var tagLen = ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
             len += tagLen;
-            if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT)
+            if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_SIGNED_INT)
                 return -1;
             len += ASN1.decode_signed(buffer, offset + len, lenValueType, out position);
             /* fileData */
             tagLen = ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
             len += tagLen;
-            if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_OCTET_STRING)
+            if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_OCTET_STRING)
                 return -1;
             //len += ASN1.decode_octet_string(buffer, offset + len, buffer.Length, target_buffer, target_offset, len_value_type);
             targetBuffer = buffer;
             targetOffset = offset + len;
             count = lenValueType;
-            len += (int)count;
+            len += (int) count;
             if (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 0))
                 return -1;
             /* a tag number is not extended so only one octet */
@@ -1872,7 +1913,7 @@ public class Services
 
         len++;
         len += ASN1.decode_object_id(buffer, offset + len, out ushort type, out objectId.instance);
-        objectId.type = (BacnetObjectTypes)type;
+        objectId.type = (BacnetObjectTypes) type;
 
         /* Tag 1: Property ID */
         len += ASN1.decode_tag_number_and_value(buffer, offset + len, out var tagNumber, out var lenValueType);
@@ -1919,6 +1960,7 @@ public class Services
         {
             ASN1.bacapp_encode_application_data(buffer, value);
         }
+
         ASN1.encode_closing_tag(buffer, 3);
     }
 
@@ -1957,7 +1999,7 @@ public class Services
 
             while (apduLen - len > 1)
             {
-                tagLen = ASN1.bacapp_decode_application_data(address, buffer, offset + len, apduLen + offset, objectId.type, (BacnetPropertyIds)property.propertyIdentifier, out var value);
+                tagLen = ASN1.bacapp_decode_application_data(address, buffer, offset + len, apduLen + offset, objectId.type, (BacnetPropertyIds) property.propertyIdentifier, out var value);
                 if (tagLen < 0) return -1;
                 len += tagLen;
                 valueList.Add(value);
@@ -1981,7 +2023,7 @@ public class Services
 
     public static void EncodeReadPropertyMultiple(EncodeBuffer buffer, BacnetObjectId objectId, IList<BacnetPropertyReference> properties)
     {
-        EncodeReadPropertyMultiple(buffer, new[] { new BacnetReadAccessSpecification(objectId, properties) });
+        EncodeReadPropertyMultiple(buffer, new[] {new BacnetReadAccessSpecification(objectId, properties)});
     }
 
     public static int DecodeReadPropertyMultiple(byte[] buffer, int offset, int apduLen, out IList<BacnetReadAccessSpecification> properties)
@@ -2023,6 +2065,7 @@ public class Services
                 values = null;
                 return -1;
             }
+
             len += tmp;
             result.Add(value);
         }
@@ -2048,6 +2091,7 @@ public class Services
         {
             ASN1.bacapp_encode_application_data(buffer, value);
         }
+
         ASN1.encode_closing_tag(buffer, 3);
 
         /* optional priority - 0 if not set, 1..16 if set */
@@ -2142,11 +2186,12 @@ public class Services
             var bValues = new List<BacnetValue>();
             while (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 2))
             {
-                var tmp = ASN1.bacapp_decode_application_data(address, buffer, offset + len, apduLen + offset, monitoredObjectIdentifier.type, (BacnetPropertyIds)newEntry.property.propertyIdentifier, out var bValue);
+                var tmp = ASN1.bacapp_decode_application_data(address, buffer, offset + len, apduLen + offset, monitoredObjectIdentifier.type, (BacnetPropertyIds) newEntry.property.propertyIdentifier, out var bValue);
                 if (tmp < 0) return -1;
                 len += tmp;
                 bValues.Add(bValue);
             }
+
             newEntry.value = bValues;
 
             /* a tag number of 2 is not extended so only one octet */
@@ -2156,10 +2201,10 @@ public class Services
             {
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out _, out lenValue);
                 len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out var decodedValue);
-                newEntry.priority = (byte)decodedValue;
+                newEntry.priority = (byte) decodedValue;
             }
             else
-                newEntry.priority = (byte)ASN1.BACNET_NO_PRIORITY;
+                newEntry.priority = (byte) ASN1.BACNET_NO_PRIORITY;
 
             _values.AddLast(newEntry);
         }
@@ -2195,6 +2240,7 @@ public class Services
         }
         else
             value.property.propertyArrayIndex = ASN1.BACNET_ARRAY_ALL;
+
         /* Tag 3: opening context tag */
         if (!ASN1.decode_is_opening_tag_number(buffer, offset + len, 3))
             return -1;
@@ -2204,11 +2250,12 @@ public class Services
         var valueList = new List<BacnetValue>();
         while (apduLen - len > 1 && !ASN1.decode_is_closing_tag_number(buffer, offset + len, 3))
         {
-            var l = ASN1.bacapp_decode_application_data(address, buffer, offset + len, apduLen + offset, objectId.type, (BacnetPropertyIds)value.property.propertyIdentifier, out var bValue);
+            var l = ASN1.bacapp_decode_application_data(address, buffer, offset + len, apduLen + offset, objectId.type, (BacnetPropertyIds) value.property.propertyIdentifier, out var bValue);
             if (l <= 0) return -1;
             len += l;
             valueList.Add(bValue);
         }
+
         value.value = valueList;
 
         if (!ASN1.decode_is_closing_tag_number(buffer, offset + len, 3))
@@ -2216,7 +2263,7 @@ public class Services
         /* a tag number of 3 is not extended so only one octet */
         len++;
         /* Tag 4: optional Priority - assumed MAX if not explicitly set */
-        value.priority = (byte)ASN1.BACNET_MAX_PRIORITY;
+        value.priority = (byte) ASN1.BACNET_MAX_PRIORITY;
         if (len < apduLen)
         {
             tagLen = ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValueType);
@@ -2225,7 +2272,7 @@ public class Services
                 len += tagLen;
                 len = ASN1.decode_unsigned(buffer, offset + len, lenValueType, out var unsignedValue);
                 if (unsignedValue >= ASN1.BACNET_MIN_PRIORITY && unsignedValue <= ASN1.BACNET_MAX_PRIORITY)
-                    value.priority = (byte)unsignedValue;
+                    value.priority = (byte) unsignedValue;
                 else
                     return -1;
             }
@@ -2255,6 +2302,7 @@ public class Services
             {
                 ASN1.bacapp_encode_application_data(buffer, value);
             }
+
             ASN1.encode_closing_tag(buffer, 2);
 
             /* Tag 3: Priority */
@@ -2289,13 +2337,14 @@ public class Services
             if (apduLen >= 4)
             {
                 len += ASN1.decode_context_object_id(buffer, offset + len, 1, out var typenr, out objectId.instance);
-                objectId.type = (BacnetObjectTypes)typenr;
+                objectId.type = (BacnetObjectTypes) typenr;
             }
             else
                 return -1;
         }
         else
             return -1;
+
         if (ASN1.decode_is_closing_tag(buffer, offset + len))
             len++;
         //end objectid
@@ -2330,6 +2379,7 @@ public class Services
                 len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out ulVal);
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
             }
+
             newEntry.property = new BacnetPropertyReference(propertyId, ulVal);
 
             /* tag 2 - Property Value */
@@ -2338,11 +2388,12 @@ public class Services
                 var values = new List<BacnetValue>();
                 while (!ASN1.decode_is_closing_tag(buffer, offset + len))
                 {
-                    var l = ASN1.bacapp_decode_application_data(address, buffer, offset + len, apduLen + offset, objectId.type, (BacnetPropertyIds)propertyId, out var value);
+                    var l = ASN1.bacapp_decode_application_data(address, buffer, offset + len, apduLen + offset, objectId.type, (BacnetPropertyIds) propertyId, out var value);
                     if (l <= 0) return -1;
                     len += l;
                     values.Add(value);
                 }
+
                 len++;
                 newEntry.value = values;
             }
@@ -2431,6 +2482,7 @@ public class Services
                 len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out ulVal);
                 len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out lenValue);
             }
+
             newEntry.property = new BacnetPropertyReference(propertyId, ulVal);
 
             /* tag 2 - Property Value */
@@ -2439,11 +2491,12 @@ public class Services
                 var values = new List<BacnetValue>();
                 while (!ASN1.decode_is_closing_tag(buffer, offset + len))
                 {
-                    var l = ASN1.bacapp_decode_application_data(address, buffer, offset + len, apduLen + offset, objectId.type, (BacnetPropertyIds)propertyId, out var value);
+                    var l = ASN1.bacapp_decode_application_data(address, buffer, offset + len, apduLen + offset, objectId.type, (BacnetPropertyIds) propertyId, out var value);
                     if (l <= 0) return -1;
                     len += l;
                     values.Add(value);
                 }
+
                 len++;
                 newEntry.value = values;
             }
@@ -2457,7 +2510,7 @@ public class Services
                 len += ASN1.decode_unsigned(buffer, offset + len, lenValue, out ulVal);
             else
                 len--;
-            newEntry.priority = (byte)ulVal;
+            newEntry.priority = (byte) ulVal;
 
             _values.AddLast(newEntry);
         }
@@ -2485,12 +2538,12 @@ public class Services
 
         /* date */
         len += ASN1.decode_tag_number_and_value(buffer, offset + len, out var tagNumber, out _);
-        if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_DATE)
+        if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_DATE)
             return -1;
         len += ASN1.decode_date(buffer, offset + len, out var date);
         /* time */
         len += ASN1.decode_tag_number_and_value(buffer, offset + len, out tagNumber, out _);
-        if (tagNumber != (byte)BacnetApplicationTags.BACNET_APPLICATION_TAG_TIME)
+        if (tagNumber != (byte) BacnetApplicationTags.BACNET_APPLICATION_TAG_TIME)
             return -1;
         len += ASN1.decode_bacnet_time(buffer, offset + len, out var time);
 
@@ -2503,8 +2556,8 @@ public class Services
     public static void EncodeError(EncodeBuffer buffer, BacnetErrorClasses errorClass, BacnetErrorCodes errorCode, byte tagNumber = 0)
     {
         ASN1.encode_opening_tag(buffer, tagNumber);
-        ASN1.encode_application_enumerated(buffer, (uint)errorClass);
-        ASN1.encode_application_enumerated(buffer, (uint)errorCode);
+        ASN1.encode_application_enumerated(buffer, (uint) errorClass);
+        ASN1.encode_application_enumerated(buffer, (uint) errorCode);
         ASN1.encode_closing_tag(buffer, tagNumber);
     }
 
@@ -2566,7 +2619,7 @@ public class Services
                     break;
 
                 case BacnetTrendLogValueType.TL_TYPE_BOOL:
-                    tmp1.Add(record.GetValue<bool>() ? (byte)1 : (byte)0);
+                    tmp1.Add(record.GetValue<bool>() ? (byte) 1 : (byte) 0);
                     break;
 
                 case BacnetTrendLogValueType.TL_TYPE_DELTA:
@@ -2593,7 +2646,8 @@ public class Services
                     ASN1.encode_bacnet_unsigned(tmp1, record.GetValue<uint>());
                     break;
             }
-            ASN1.encode_tag(buffer, (byte)record.type, true, (uint)tmp1.offset);
+
+            ASN1.encode_tag(buffer, (byte) record.type, true, (uint) tmp1.offset);
             buffer.Add(tmp1.buffer, tmp1.offset);
             ASN1.encode_closing_tag(buffer, 1);
         }
@@ -2636,10 +2690,10 @@ public class Services
             records[curveNumber] = new BacnetLogRecord
             {
                 timestamp = dt,
-                type = (BacnetTrendLogValueType)contextTagType
+                type = (BacnetTrendLogValueType) contextTagType
             };
 
-            switch ((BacnetTrendLogValueType)contextTagType)
+            switch ((BacnetTrendLogValueType) contextTagType)
             {
                 case BacnetTrendLogValueType.TL_TYPE_STATUS:
                     len += ASN1.decode_bitstring(buffer, offset + len, lenValue, out var sval);

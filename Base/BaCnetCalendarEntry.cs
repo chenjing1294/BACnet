@@ -64,6 +64,5 @@ public struct BACnetCalendarEntry : ASN1.IEncode, ASN1.IDecode
                     return len - 1; // closing Tag
             }
         }
-
     }
 }

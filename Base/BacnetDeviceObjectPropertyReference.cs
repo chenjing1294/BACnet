@@ -29,25 +29,22 @@ public struct BacnetDeviceObjectPropertyReference : ASN1.IEncode
     public int ArrayIndex // shows -1 when it's ASN1.BACNET_ARRAY_ALL
     {
         get => arrayIndex != ASN1.BACNET_ARRAY_ALL
-            ? (int)arrayIndex
+            ? (int) arrayIndex
             : -1;
         set => arrayIndex = value < 0
             ? ASN1.BACNET_ARRAY_ALL
-            : (uint)value;
+            : (uint) value;
     }
 
-    public BacnetObjectId? DeviceId  // shows null when it's not OBJECT_DEVICE
+    public BacnetObjectId? DeviceId // shows null when it's not OBJECT_DEVICE
     {
         get
         {
             return deviceIndentifier.type == BacnetObjectTypes.OBJECT_DEVICE
-                ? (BacnetObjectId?)deviceIndentifier
+                ? (BacnetObjectId?) deviceIndentifier
                 : null;
         }
-        set
-        {
-            deviceIndentifier = value ?? new BacnetObjectId();
-        }
+        set { deviceIndentifier = value ?? new BacnetObjectId(); }
     }
 
     public BacnetPropertyIds PropertyId
@@ -58,7 +55,7 @@ public struct BacnetDeviceObjectPropertyReference : ASN1.IEncode
 
     public static object Parse(string value)
     {
-        var parts = value.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+        var parts = value.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
 
         BacnetObjectId? deviceId = null;
         BacnetObjectId objectId;
@@ -83,7 +80,7 @@ public struct BacnetDeviceObjectPropertyReference : ASN1.IEncode
             if (!uint.TryParse(parts.Last(), out var vendorSpecificPropertyId))
                 throw new ArgumentException("Invalid format of property id", nameof(value));
 
-            propertyId = (BacnetPropertyIds)vendorSpecificPropertyId;
+            propertyId = (BacnetPropertyIds) vendorSpecificPropertyId;
         }
 
         return new BacnetDeviceObjectPropertyReference

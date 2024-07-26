@@ -46,7 +46,7 @@ public class BacnetPipeTransport : IBacnetSerialTransport
     {
         uint bytesAvail = 0;
         return PeekNamedPipe(_conn.SafePipeHandle.DangerousGetHandle(), IntPtr.Zero, 0, IntPtr.Zero, ref bytesAvail, IntPtr.Zero)
-            ? (int)bytesAvail
+            ? (int) bytesAvail
             : 0;
     }
 
@@ -63,7 +63,7 @@ public class BacnetPipeTransport : IBacnetSerialTransport
     public override bool Equals(object obj)
     {
         if (obj is not BacnetPipeTransport) return false;
-        var a = (BacnetPipeTransport)obj;
+        var a = (BacnetPipeTransport) obj;
         return Name.Equals(a.Name);
     }
 
@@ -74,7 +74,7 @@ public class BacnetPipeTransport : IBacnetSerialTransport
         if (!_isServer)
         {
             _conn = new NamedPipeClientStream(".", Name, PipeDirection.InOut, PipeOptions.Asynchronous);
-            ((NamedPipeClientStream)_conn).Connect(3000);
+            ((NamedPipeClientStream) _conn).Connect(3000);
         }
         else
         {
@@ -107,8 +107,10 @@ public class BacnetPipeTransport : IBacnetSerialTransport
             catch
             {
             }
+
             _currentConnect = null;
         }
+
         _currentRead = null;
     }
 
@@ -117,7 +119,7 @@ public class BacnetPipeTransport : IBacnetSerialTransport
         if (_conn.IsConnected) return true;
         if (_conn is not NamedPipeServerStream) return true;
 
-        var server = (NamedPipeServerStream)_conn;
+        var server = (NamedPipeServerStream) _conn;
 
         if (_currentConnect == null)
         {
@@ -142,6 +144,7 @@ public class BacnetPipeTransport : IBacnetSerialTransport
             {
                 Disconnect();
             }
+
             _currentConnect = null;
         }
 
@@ -194,6 +197,7 @@ public class BacnetPipeTransport : IBacnetSerialTransport
     }
 
     #region " Interop Get Pipe Names "
+
     // ReSharper disable All
 
     [StructLayout(LayoutKind.Sequential)]
@@ -214,16 +218,20 @@ public class BacnetPipeTransport : IBacnetSerialTransport
         public uint nFileSizeLow;
         public uint dwReserved0;
         public uint dwReserved1;
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
         public string cFileName;
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)]
         public string cAlternateFileName;
     }
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr FindFirstFile(string lpFileName, out WIN32_FIND_DATA lpFindFileData);
+
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
     private static extern int FindNextFile(IntPtr hFindFile, out WIN32_FIND_DATA lpFindFileData);
+
     [DllImport("kernel32.dll")]
     private static extern bool FindClose(IntPtr hFindFile);
 
@@ -242,8 +250,7 @@ public class BacnetPipeTransport : IBacnetSerialTransport
             do
             {
                 ret.Add(data.cFileName);
-            }
-            while (FindNextFile(handle, out data) != 0);
+            } while (FindNextFile(handle, out data) != 0);
 
             FindClose(handle);
             return ret.ToArray();
@@ -251,5 +258,6 @@ public class BacnetPipeTransport : IBacnetSerialTransport
     }
 
     // ReSharper restore
+
     #endregion
 }

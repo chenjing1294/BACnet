@@ -7,6 +7,7 @@ public enum BacnetProgramError : ushort
     PROGRAM_ERROR_INTERNAL = 2,
     PROGRAM_ERROR_PROGRAM = 3,
     PROGRAM_ERROR_OTHER = 4,
+
     /* Enumerated values 0-63 are reserved for definition by ASHRAE.  */
     /* Enumerated values 64-65535 may be used by others subject to  */
     /* the procedures and constraints described in Clause 23. */
